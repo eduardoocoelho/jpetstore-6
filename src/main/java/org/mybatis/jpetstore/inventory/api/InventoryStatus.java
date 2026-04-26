@@ -15,10 +15,5 @@
  */
 package org.mybatis.jpetstore.inventory.api;
 
-public interface InventoryQueryService {
-
-  boolean isItemInStock(String itemId);
-
-  InventoryStatus getInventoryStatus(String itemId);
-
+public record InventoryStatus(String itemId, int quantity, boolean inStock) {
 }

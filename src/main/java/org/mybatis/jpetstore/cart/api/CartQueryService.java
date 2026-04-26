@@ -16,10 +16,16 @@
 package org.mybatis.jpetstore.cart.api;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
+import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
+import org.mybatis.jpetstore.catalog.api.ProductSummary;
 import org.mybatis.jpetstore.domain.Cart;
 import org.mybatis.jpetstore.domain.CartItem;
+import org.mybatis.jpetstore.domain.Item;
+import org.mybatis.jpetstore.domain.Product;
 
 public interface CartQueryService {
 
@@ -28,5 +34,32 @@ public interface CartQueryService {
   int getNumberOfItems(Cart cart);
 
   BigDecimal getSubTotal(Cart cart);
+
+  default CartSnapshot getCartSnapshot(Cart cart) {
+    List<CartLineSnapshot> lines = new ArrayList<>();
+    Iterator<CartItem> cartItems = cart.getAllCartItems();
+    while (cartItems.hasNext()) {
+      CartItem cartItem = cartItems.next();
+      lines.add(toCartLineSnapshot(cartItem));
+    }
+    return new CartSnapshot(lines, cart.getSubTotal());
+  }
+
+  private static CartLineSnapshot toCartLineSnapshot(CartItem cartItem) {
+    return new CartLineSnapshot(toItemSnapshot(cartItem.getItem()), cartItem.getQuantity(), cartItem.isInStock(),
+        cartItem.getTotal());
+  }
+
+  private static ItemSnapshot toItemSnapshot(Item item) {
+    Product product = item.getProduct();
+    ProductSummary productSummary = null;
+    if (product != null) {
+      productSummary = new ProductSummary(product.getProductId(), product.getCategoryId(), product.getName(),
+          product.getDescription());
+    }
+    return new ItemSnapshot(item.getItemId(), product == null ? null : product.getProductId(), productSummary,
+        item.getListPrice(), item.getStatus(), item.getAttribute1(), item.getAttribute2(), item.getAttribute3(),
+        item.getAttribute4(), item.getAttribute5());
+  }
 
 }

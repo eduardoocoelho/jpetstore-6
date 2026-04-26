@@ -23,4 +23,8 @@ public interface AccountQueryService {
 
   Account getAccount(String username, String password);
 
+  CustomerProfile getCustomerProfile(String username);
+
+  CustomerProfile getCustomerProfile(String username, String password);
+
 }

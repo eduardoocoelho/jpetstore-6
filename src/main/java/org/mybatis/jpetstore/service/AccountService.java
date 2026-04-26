@@ -18,6 +18,7 @@ package org.mybatis.jpetstore.service;
 import java.util.Optional;
 
 import org.mybatis.jpetstore.account.api.AccountQueryService;
+import org.mybatis.jpetstore.account.api.CustomerProfile;
 import org.mybatis.jpetstore.domain.Account;
 import org.mybatis.jpetstore.mapper.AccountMapper;
 import org.springframework.stereotype.Service;
@@ -47,6 +48,16 @@ public class AccountService implements AccountQueryService {
     return accountMapper.getAccountByUsernameAndPassword(username, password);
   }
 
+  @Override
+  public CustomerProfile getCustomerProfile(String username) {
+    return toCustomerProfile(getAccount(username));
+  }
+
+  @Override
+  public CustomerProfile getCustomerProfile(String username, String password) {
+    return toCustomerProfile(getAccount(username, password));
+  }
+
   /**
    * Insert account.
    *
@@ -73,6 +84,15 @@ public class AccountService implements AccountQueryService {
 
     Optional.ofNullable(account.getPassword()).filter(password -> password.length() > 0)
         .ifPresent(password -> accountMapper.updateSignon(account));
+  }
+
+  private static CustomerProfile toCustomerProfile(Account account) {
+    if (account == null) {
+      return null;
+    }
+    return new CustomerProfile(account.getUsername(), account.getEmail(), account.getFirstName(), account.getLastName(),
+        account.getAddress1(), account.getAddress2(), account.getCity(), account.getState(), account.getZip(),
+        account.getCountry(), account.getPhone(), account.getFavouriteCategoryId(), account.getLanguagePreference());
   }
 
 }

@@ -13,12 +13,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.mybatis.jpetstore.inventory.api;
+package org.mybatis.jpetstore.account.api;
 
-public interface InventoryQueryService {
-
-  boolean isItemInStock(String itemId);
-
-  InventoryStatus getInventoryStatus(String itemId);
-
+public record CustomerProfile(String username, String email, String firstName, String lastName, String address1,
+    String address2, String city, String state, String zip, String country, String phone, String favouriteCategoryId,
+    String languagePreference) {
 }

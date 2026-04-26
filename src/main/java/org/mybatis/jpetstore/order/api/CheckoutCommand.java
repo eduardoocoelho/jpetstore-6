@@ -13,12 +13,10 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.mybatis.jpetstore.inventory.api;
+package org.mybatis.jpetstore.order.api;
 
-public interface InventoryQueryService {
+import org.mybatis.jpetstore.account.api.CustomerProfile;
+import org.mybatis.jpetstore.cart.api.CartSnapshot;
 
-  boolean isItemInStock(String itemId);
-
-  InventoryStatus getInventoryStatus(String itemId);
-
+public record CheckoutCommand(CustomerProfile customer, CartSnapshot cart) {
 }

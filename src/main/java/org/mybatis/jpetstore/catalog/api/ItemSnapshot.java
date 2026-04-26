@@ -15,32 +15,8 @@
  */
 package org.mybatis.jpetstore.catalog.api;
 
-import java.util.List;
+import java.math.BigDecimal;
 
-import org.mybatis.jpetstore.domain.Category;
-import org.mybatis.jpetstore.domain.Item;
-import org.mybatis.jpetstore.domain.Product;
-
-public interface CatalogQueryService {
-
-  List<Category> getCategoryList();
-
-  Category getCategory(String categoryId);
-
-  Product getProduct(String productId);
-
-  ProductSummary getProductSummary(String productId);
-
-  List<Product> getProductListByCategory(String categoryId);
-
-  List<ProductSummary> getProductSummariesByCategory(String categoryId);
-
-  List<Product> searchProductList(String keywords);
-
-  List<Item> getItemListByProduct(String productId);
-
-  Item getItem(String itemId);
-
-  ItemSnapshot getItemSnapshot(String itemId);
-
+public record ItemSnapshot(String itemId, String productId, ProductSummary product, BigDecimal listPrice, String status,
+    String attribute1, String attribute2, String attribute3, String attribute4, String attribute5) {
 }

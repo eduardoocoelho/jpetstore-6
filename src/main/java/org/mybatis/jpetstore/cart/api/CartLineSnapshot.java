@@ -13,12 +13,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.mybatis.jpetstore.inventory.api;
+package org.mybatis.jpetstore.cart.api;
 
-public interface InventoryQueryService {
+import java.math.BigDecimal;
 
-  boolean isItemInStock(String itemId);
+import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
 
-  InventoryStatus getInventoryStatus(String itemId);
-
+public record CartLineSnapshot(ItemSnapshot item, int quantity, boolean inStock, BigDecimal total) {
 }

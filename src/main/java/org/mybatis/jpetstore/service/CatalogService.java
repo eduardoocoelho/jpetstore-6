@@ -19,10 +19,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.mybatis.jpetstore.catalog.api.CatalogQueryService;
+import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
+import org.mybatis.jpetstore.catalog.api.ProductSummary;
 import org.mybatis.jpetstore.domain.Category;
 import org.mybatis.jpetstore.domain.Item;
 import org.mybatis.jpetstore.domain.Product;
 import org.mybatis.jpetstore.inventory.api.InventoryQueryService;
+import org.mybatis.jpetstore.inventory.api.InventoryStatus;
 import org.mybatis.jpetstore.mapper.CategoryMapper;
 import org.mybatis.jpetstore.mapper.ItemMapper;
 import org.mybatis.jpetstore.mapper.ProductMapper;
@@ -62,8 +65,18 @@ public class CatalogService implements CatalogQueryService, InventoryQueryServic
   }
 
   @Override
+  public ProductSummary getProductSummary(String productId) {
+    return toProductSummary(getProduct(productId));
+  }
+
+  @Override
   public List<Product> getProductListByCategory(String categoryId) {
     return productMapper.getProductListByCategory(categoryId);
+  }
+
+  @Override
+  public List<ProductSummary> getProductSummariesByCategory(String categoryId) {
+    return getProductListByCategory(categoryId).stream().map(CatalogService::toProductSummary).toList();
   }
 
   /**
@@ -94,7 +107,36 @@ public class CatalogService implements CatalogQueryService, InventoryQueryServic
   }
 
   @Override
+  public ItemSnapshot getItemSnapshot(String itemId) {
+    return toItemSnapshot(getItem(itemId));
+  }
+
+  @Override
   public boolean isItemInStock(String itemId) {
     return itemMapper.getInventoryQuantity(itemId) > 0;
+  }
+
+  @Override
+  public InventoryStatus getInventoryStatus(String itemId) {
+    int quantity = itemMapper.getInventoryQuantity(itemId);
+    return new InventoryStatus(itemId, quantity, quantity > 0);
+  }
+
+  private static ProductSummary toProductSummary(Product product) {
+    if (product == null) {
+      return null;
+    }
+    return new ProductSummary(product.getProductId(), product.getCategoryId(), product.getName(),
+        product.getDescription());
+  }
+
+  private static ItemSnapshot toItemSnapshot(Item item) {
+    if (item == null) {
+      return null;
+    }
+    Product product = item.getProduct();
+    return new ItemSnapshot(item.getItemId(), product == null ? null : product.getProductId(),
+        toProductSummary(product), item.getListPrice(), item.getStatus(), item.getAttribute1(), item.getAttribute2(),
+        item.getAttribute3(), item.getAttribute4(), item.getAttribute5());
   }
 }

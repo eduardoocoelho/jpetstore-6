@@ -27,10 +27,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mybatis.jpetstore.catalog.api.CatalogQueryService;
+import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
+import org.mybatis.jpetstore.catalog.api.ProductSummary;
 import org.mybatis.jpetstore.domain.Category;
 import org.mybatis.jpetstore.domain.Item;
 import org.mybatis.jpetstore.domain.Product;
 import org.mybatis.jpetstore.inventory.api.InventoryQueryService;
+import org.mybatis.jpetstore.inventory.api.InventoryStatus;
 import org.mybatis.jpetstore.mapper.CategoryMapper;
 import org.mybatis.jpetstore.mapper.ItemMapper;
 import org.mybatis.jpetstore.mapper.ProductMapper;
@@ -122,6 +125,27 @@ class CatalogServiceTest {
   }
 
   @Test
+  void shouldMapProductToProductSummary() {
+    // given
+    String productId = "P01";
+    Product product = new Product();
+    product.setProductId(productId);
+    product.setCategoryId("C01");
+    product.setName("Angelfish");
+    product.setDescription("Fresh Water fish from China");
+
+    // when
+    when(productMapper.getProduct(productId)).thenReturn(product);
+    ProductSummary productSummary = catalogService.getProductSummary(productId);
+
+    // then
+    assertThat(productSummary.productId()).isEqualTo(productId);
+    assertThat(productSummary.categoryId()).isEqualTo("C01");
+    assertThat(productSummary.name()).isEqualTo("Angelfish");
+    assertThat(productSummary.description()).isEqualTo("Fresh Water fish from China");
+  }
+
+  @Test
   void shouldReturnProductList() {
     // given
     String categoryId = "C01";
@@ -134,6 +158,27 @@ class CatalogServiceTest {
     // then
     assertThat(products).isSameAs(expectedProducts);
 
+  }
+
+  @Test
+  void shouldMapProductsByCategoryToProductSummaries() {
+    // given
+    String categoryId = "C01";
+    Product product = new Product();
+    product.setProductId("P01");
+    product.setCategoryId(categoryId);
+    product.setName("Angelfish");
+    product.setDescription("Fresh Water fish from China");
+
+    // when
+    when(productMapper.getProductListByCategory(categoryId)).thenReturn(List.of(product));
+    List<ProductSummary> productSummaries = catalogService.getProductSummariesByCategory(categoryId);
+
+    // then
+    assertThat(productSummaries).hasSize(1);
+    assertThat(productSummaries.get(0).productId()).isEqualTo("P01");
+    assertThat(productSummaries.get(0).categoryId()).isEqualTo(categoryId);
+    assertThat(productSummaries.get(0).name()).isEqualTo("Angelfish");
   }
 
   @Test
@@ -168,6 +213,38 @@ class CatalogServiceTest {
   }
 
   @Test
+  void shouldMapItemToItemSnapshotWithoutInventoryQuantity() {
+    // given
+    String itemCode = "I01";
+    Product product = new Product();
+    product.setProductId("P01");
+    product.setCategoryId("C01");
+    product.setName("Angelfish");
+    product.setDescription("Fresh Water fish from China");
+    Item item = new Item();
+    item.setItemId(itemCode);
+    item.setProduct(product);
+    item.setListPrice(new java.math.BigDecimal("16.50"));
+    item.setStatus("P");
+    item.setAttribute1("Large");
+    item.setAttribute2("Male");
+    item.setQuantity(7);
+
+    // when
+    when(itemMapper.getItem(itemCode)).thenReturn(item);
+    ItemSnapshot itemSnapshot = catalogService.getItemSnapshot(itemCode);
+
+    // then
+    assertThat(itemSnapshot.itemId()).isEqualTo(itemCode);
+    assertThat(itemSnapshot.productId()).isEqualTo("P01");
+    assertThat(itemSnapshot.product().name()).isEqualTo("Angelfish");
+    assertThat(itemSnapshot.listPrice()).isEqualTo(new java.math.BigDecimal("16.50"));
+    assertThat(itemSnapshot.status()).isEqualTo("P");
+    assertThat(itemSnapshot.attribute1()).isEqualTo("Large");
+    assertThat(itemSnapshot.attribute2()).isEqualTo("Male");
+  }
+
+  @Test
   void shouldReturnTrueWhenExistStock() {
 
     // given
@@ -195,6 +272,21 @@ class CatalogServiceTest {
     // then
     assertThat(result).isFalse();
 
+  }
+
+  @Test
+  void shouldMapInventoryQuantityToInventoryStatus() {
+    // given
+    String itemCode = "I01";
+
+    // when
+    when(itemMapper.getInventoryQuantity(itemCode)).thenReturn(3);
+    InventoryStatus inventoryStatus = catalogService.getInventoryStatus(itemCode);
+
+    // then
+    assertThat(inventoryStatus.itemId()).isEqualTo(itemCode);
+    assertThat(inventoryStatus.quantity()).isEqualTo(3);
+    assertThat(inventoryStatus.inStock()).isTrue();
   }
 
 }
