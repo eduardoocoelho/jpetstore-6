@@ -1,5 +1,5 @@
 /*
- *    Copyright 2010-2023 the original author or authors.
+ *    Copyright 2010-2026 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -18,9 +18,11 @@ package org.mybatis.jpetstore.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.mybatis.jpetstore.catalog.api.CatalogQueryService;
 import org.mybatis.jpetstore.domain.Category;
 import org.mybatis.jpetstore.domain.Item;
 import org.mybatis.jpetstore.domain.Product;
+import org.mybatis.jpetstore.inventory.api.InventoryQueryService;
 import org.mybatis.jpetstore.mapper.CategoryMapper;
 import org.mybatis.jpetstore.mapper.ItemMapper;
 import org.mybatis.jpetstore.mapper.ProductMapper;
@@ -32,7 +34,7 @@ import org.springframework.stereotype.Service;
  * @author Eduardo Macarron
  */
 @Service
-public class CatalogService {
+public class CatalogService implements CatalogQueryService, InventoryQueryService {
 
   private final CategoryMapper categoryMapper;
   private final ItemMapper itemMapper;
@@ -44,18 +46,22 @@ public class CatalogService {
     this.productMapper = productMapper;
   }
 
+  @Override
   public List<Category> getCategoryList() {
     return categoryMapper.getCategoryList();
   }
 
+  @Override
   public Category getCategory(String categoryId) {
     return categoryMapper.getCategory(categoryId);
   }
 
+  @Override
   public Product getProduct(String productId) {
     return productMapper.getProduct(productId);
   }
 
+  @Override
   public List<Product> getProductListByCategory(String categoryId) {
     return productMapper.getProductListByCategory(categoryId);
   }
@@ -68,6 +74,7 @@ public class CatalogService {
    *
    * @return the list
    */
+  @Override
   public List<Product> searchProductList(String keywords) {
     List<Product> products = new ArrayList<>();
     for (String keyword : keywords.split("\\s+")) {
@@ -76,14 +83,17 @@ public class CatalogService {
     return products;
   }
 
+  @Override
   public List<Item> getItemListByProduct(String productId) {
     return itemMapper.getItemListByProduct(productId);
   }
 
+  @Override
   public Item getItem(String itemId) {
     return itemMapper.getItem(itemId);
   }
 
+  @Override
   public boolean isItemInStock(String itemId) {
     return itemMapper.getInventoryQuantity(itemId) > 0;
   }
