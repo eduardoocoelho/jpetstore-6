@@ -1,5 +1,5 @@
 /*
- *    Copyright 2010-2022 the original author or authors.
+ *    Copyright 2010-2026 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -28,7 +28,9 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-@MapperScan("org.mybatis.jpetstore.mapper")
+@MapperScan({ "org.mybatis.jpetstore.mapper", "org.mybatis.jpetstore.account.persistence",
+    "org.mybatis.jpetstore.catalog.persistence", "org.mybatis.jpetstore.inventory.persistence",
+    "org.mybatis.jpetstore.order.persistence" })
 public class MapperTestContext {
 
   @Bean
@@ -47,7 +49,10 @@ public class MapperTestContext {
   SqlSessionFactoryBean sqlSessionFactory() {
     SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
     factoryBean.setDataSource(dataSource());
-    factoryBean.setTypeAliasesPackage("org.mybatis.jpetstore.domain");
+    factoryBean.setTypeAliasesPackage(
+        "org.mybatis.jpetstore.domain, org.mybatis.jpetstore.account.domain, org.mybatis.jpetstore.catalog.domain,"
+            + " org.mybatis.jpetstore.inventory.domain, org.mybatis.jpetstore.cart.domain,"
+            + " org.mybatis.jpetstore.order.domain");
     return factoryBean;
   }
 
