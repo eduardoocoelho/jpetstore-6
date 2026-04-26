@@ -16,9 +16,30 @@
 package org.mybatis.jpetstore.web.actions;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import net.sourceforge.stripes.action.ActionBeanContext;
+import net.sourceforge.stripes.action.Message;
+import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.config.Configuration;
+import net.sourceforge.stripes.controller.ActionResolver;
+import net.sourceforge.stripes.controller.StripesFilter;
 
 import org.junit.jupiter.api.Test;
 import org.mybatis.jpetstore.domain.Account;
+import org.mybatis.jpetstore.domain.Product;
+import org.mybatis.jpetstore.service.AccountService;
+import org.mybatis.jpetstore.service.CatalogService;
+import org.springframework.test.util.ReflectionTestUtils;
 
 class AccountActionBeanTest {
 
@@ -112,5 +133,76 @@ class AccountActionBeanTest {
     assertThat(actual.getZip()).isNull();
     assertThat(actual.getCity()).isNull();
 
+  }
+
+  @Test
+  void signonLoadsAccountFavoriteCategoryProductListAndRegistersSessionAlias() {
+    AccountActionBean accountActionBean = new AccountActionBean();
+    AccountService accountService = mock(AccountService.class);
+    CatalogService catalogService = mock(CatalogService.class);
+    ActionBeanContext context = mock(ActionBeanContext.class);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    HttpSession session = mock(HttpSession.class);
+    List<Product> favoriteProducts = List.of(new Product());
+
+    Account account = new Account();
+    account.setUsername("j2ee");
+    account.setPassword("j2ee");
+    account.setFirstName("ABC");
+    account.setFavouriteCategoryId("DOGS");
+
+    ReflectionTestUtils.setField(accountActionBean, "accountService", accountService);
+    ReflectionTestUtils.setField(accountActionBean, "catalogService", catalogService);
+    when(context.getRequest()).thenReturn(request);
+    when(request.getSession()).thenReturn(session);
+    when(accountService.getAccount("j2ee", "j2ee")).thenReturn(account);
+    when(catalogService.getProductListByCategory("DOGS")).thenReturn(favoriteProducts);
+    configureStripesActionResolver();
+    accountActionBean.setContext(context);
+    accountActionBean.setUsername("j2ee");
+    accountActionBean.setPassword("j2ee");
+
+    Resolution resolution = accountActionBean.signon();
+
+    assertThat(resolution.toString()).contains("Catalog.action");
+    assertThat(accountActionBean.isAuthenticated()).isTrue();
+    assertThat(accountActionBean.getAccount()).isSameAs(account);
+    assertThat(accountActionBean.getPassword()).isNull();
+    assertThat(accountActionBean.getMyList()).isSameAs(favoriteProducts);
+    verify(session).setAttribute("accountBean", accountActionBean);
+  }
+
+  @Test
+  void signonFailureClearsAccountAndKeepsFavoriteListEmpty() {
+    AccountActionBean accountActionBean = new AccountActionBean();
+    AccountService accountService = mock(AccountService.class);
+    ActionBeanContext context = mock(ActionBeanContext.class);
+
+    ReflectionTestUtils.setField(accountActionBean, "accountService", accountService);
+    when(context.getMessages()).thenReturn(new ArrayList<Message>());
+    when(accountService.getAccount("bad-user", "bad-password")).thenReturn(null);
+    accountActionBean.setContext(context);
+    accountActionBean.setUsername("bad-user");
+    accountActionBean.setPassword("bad-password");
+
+    Resolution resolution = accountActionBean.signon();
+
+    assertThat(resolution.toString()).contains("SignonForm.jsp");
+    assertThat(accountActionBean.isAuthenticated()).isFalse();
+    assertThat(accountActionBean.getUsername()).isNull();
+    assertThat(accountActionBean.getMyList()).isNull();
+    assertThat(context.getMessages()).extracting(message -> message.getMessage(Locale.getDefault()))
+        .containsExactly("Invalid username or password.  Signon failed.");
+  }
+
+  @SuppressWarnings("unchecked")
+  private static void configureStripesActionResolver() {
+    Configuration configuration = mock(Configuration.class);
+    ActionResolver actionResolver = mock(ActionResolver.class);
+    ThreadLocal<Configuration> configurationStash = (ThreadLocal<Configuration>) ReflectionTestUtils
+        .getField(StripesFilter.class, "configurationStash");
+    when(configuration.getActionResolver()).thenReturn(actionResolver);
+    when(actionResolver.getUrlBinding(CatalogActionBean.class)).thenReturn("/actions/Catalog.action");
+    configurationStash.set(configuration);
   }
 }

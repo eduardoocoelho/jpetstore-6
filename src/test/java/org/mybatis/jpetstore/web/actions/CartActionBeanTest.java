@@ -17,126 +17,211 @@ package org.mybatis.jpetstore.web.actions;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+
+import javax.servlet.http.HttpServletRequest;
 
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.Message;
 import net.sourceforge.stripes.action.Resolution;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mybatis.jpetstore.domain.Cart;
+import org.mybatis.jpetstore.domain.Item;
+import org.mybatis.jpetstore.service.CatalogService;
+import org.springframework.test.util.ReflectionTestUtils;
 
 class CartActionBeanTest {
 
-    private CartActionBean cartActionBean;
-    private ActionBeanContext mockContext;
+  private CartActionBean cartActionBean;
+  private ActionBeanContext mockContext;
 
-    @BeforeEach
-    void setUp() {
-        cartActionBean = new CartActionBean();
-        cartActionBean.setCart(new Cart());
+  @BeforeEach
+  void setUp() {
+    cartActionBean = new CartActionBean();
+    cartActionBean.setCart(new Cart());
 
-        // Mock ActionBeanContext to avoid NPE in setMessage()
-        mockContext = mock(ActionBeanContext.class);
-        when(mockContext.getMessages()).thenReturn(new ArrayList<Message>());
-        cartActionBean.setContext(mockContext);
-    }
+    // Mock ActionBeanContext to avoid NPE in setMessage()
+    mockContext = mock(ActionBeanContext.class);
+    when(mockContext.getMessages()).thenReturn(new ArrayList<Message>());
+    cartActionBean.setContext(mockContext);
+  }
 
-    @Test
-    void constructorOutputNotNull() {
-        final CartActionBean actual = new CartActionBean();
+  @Test
+  void constructorOutputNotNull() {
+    final CartActionBean actual = new CartActionBean();
 
-        assertThat(actual).isNotNull();
-        assertThat(actual.getCart()).isNotNull();
-        assertThat(actual.getContext()).isNull();
-    }
+    assertThat(actual).isNotNull();
+    assertThat(actual.getCart()).isNotNull();
+    assertThat(actual.getContext()).isNull();
+  }
 
-    @Test
-    void getCartOutputNotNull() {
-        final CartActionBean bean = new CartActionBean();
+  @Test
+  void getCartOutputNotNull() {
+    final CartActionBean bean = new CartActionBean();
 
-        assertThat(bean.getCart()).isNotNull();
-    }
+    assertThat(bean.getCart()).isNotNull();
+  }
 
-    @Test
-    void addItemToCart_WithNullWorkingItemId_ShouldReturnError() {
-        cartActionBean.setWorkingItemId(null);
+  @Test
+  void addItemToCart_WithNullWorkingItemId_ShouldReturnError() {
+    cartActionBean.setWorkingItemId(null);
 
-        Resolution resolution = cartActionBean.addItemToCart();
+    Resolution resolution = cartActionBean.addItemToCart();
 
-        assertThat(resolution).isNotNull();
-        assertThat(resolution.toString()).contains("Error.jsp");
-    }
+    assertThat(resolution).isNotNull();
+    assertThat(resolution.toString()).contains("Error.jsp");
+  }
 
-    @Test
-    void addItemToCart_WithEmptyWorkingItemId_ShouldReturnError() {
-        cartActionBean.setWorkingItemId("");
+  @Test
+  void addItemToCart_WithEmptyWorkingItemId_ShouldReturnError() {
+    cartActionBean.setWorkingItemId("");
 
-        Resolution resolution = cartActionBean.addItemToCart();
+    Resolution resolution = cartActionBean.addItemToCart();
 
-        assertThat(resolution).isNotNull();
-        assertThat(resolution.toString()).contains("Error.jsp");
-    }
+    assertThat(resolution).isNotNull();
+    assertThat(resolution.toString()).contains("Error.jsp");
+  }
 
-    @Test
-    void addItemToCart_WithBlankWorkingItemId_ShouldReturnError() {
-        cartActionBean.setWorkingItemId("   ");
+  @Test
+  void addItemToCart_WithBlankWorkingItemId_ShouldReturnError() {
+    cartActionBean.setWorkingItemId("   ");
 
-        Resolution resolution = cartActionBean.addItemToCart();
+    Resolution resolution = cartActionBean.addItemToCart();
 
-        assertThat(resolution).isNotNull();
-        assertThat(resolution.toString()).contains("Error.jsp");
-    }
+    assertThat(resolution).isNotNull();
+    assertThat(resolution.toString()).contains("Error.jsp");
+  }
 
-    @Test
-    void removeItemFromCart_WithNullWorkingItemId_ShouldReturnError() {
-        cartActionBean.setWorkingItemId(null);
+  @Test
+  void addItemToCartWhenItemIsAbsentLoadsItemAndStockFromCatalogService() {
+    CatalogService catalogService = mock(CatalogService.class);
+    Item item = item("EST-1", "16.50");
+    ReflectionTestUtils.setField(cartActionBean, "catalogService", catalogService);
+    when(catalogService.isItemInStock("EST-1")).thenReturn(true);
+    when(catalogService.getItem("EST-1")).thenReturn(item);
+    cartActionBean.setWorkingItemId("EST-1");
 
-        Resolution resolution = cartActionBean.removeItemFromCart();
+    Resolution resolution = cartActionBean.addItemToCart();
 
-        assertThat(resolution).isNotNull();
-        assertThat(resolution.toString()).contains("Error.jsp");
-    }
+    assertThat(resolution.toString()).contains("Cart.jsp");
+    assertThat(cartActionBean.getCart().getNumberOfItems()).isEqualTo(1);
+    assertThat(cartActionBean.getCart().getCartItemList().get(0).getItem()).isSameAs(item);
+    assertThat(cartActionBean.getCart().getCartItemList().get(0).isInStock()).isTrue();
+    assertThat(cartActionBean.getCart().getCartItemList().get(0).getQuantity()).isEqualTo(1);
+  }
 
-    @Test
-    void removeItemFromCart_WithEmptyWorkingItemId_ShouldReturnError() {
-        cartActionBean.setWorkingItemId("");
+  @Test
+  void addItemToCartWhenItemIsAlreadyPresentOnlyIncrementsQuantity() {
+    CatalogService catalogService = mock(CatalogService.class);
+    Item item = item("EST-1", "16.50");
+    cartActionBean.getCart().addItem(item, true);
+    ReflectionTestUtils.setField(cartActionBean, "catalogService", catalogService);
+    cartActionBean.setWorkingItemId("EST-1");
 
-        Resolution resolution = cartActionBean.removeItemFromCart();
+    Resolution resolution = cartActionBean.addItemToCart();
 
-        assertThat(resolution).isNotNull();
-        assertThat(resolution.toString()).contains("Error.jsp");
-    }
+    assertThat(resolution.toString()).contains("Cart.jsp");
+    assertThat(cartActionBean.getCart().getCartItemList().get(0).getQuantity()).isEqualTo(2);
+    verify(catalogService, never()).isItemInStock("EST-1");
+    verify(catalogService, never()).getItem("EST-1");
+  }
 
-    @Test
-    void removeItemFromCart_WithBlankWorkingItemId_ShouldReturnError() {
-        cartActionBean.setWorkingItemId("   ");
+  @Test
+  void removeItemFromCart_WithNullWorkingItemId_ShouldReturnError() {
+    cartActionBean.setWorkingItemId(null);
 
-        Resolution resolution = cartActionBean.removeItemFromCart();
+    Resolution resolution = cartActionBean.removeItemFromCart();
 
-        assertThat(resolution).isNotNull();
-        assertThat(resolution.toString()).contains("Error.jsp");
-    }
+    assertThat(resolution).isNotNull();
+    assertThat(resolution.toString()).contains("Error.jsp");
+  }
 
-    @Test
-    void removeItemFromCart_WithNonExistentItem_ShouldReturnError() {
-        cartActionBean.setWorkingItemId("NON_EXISTENT_ITEM");
+  @Test
+  void removeItemFromCart_WithEmptyWorkingItemId_ShouldReturnError() {
+    cartActionBean.setWorkingItemId("");
 
-        Resolution resolution = cartActionBean.removeItemFromCart();
+    Resolution resolution = cartActionBean.removeItemFromCart();
 
-        assertThat(resolution).isNotNull();
-        assertThat(resolution.toString()).contains("Error.jsp");
-    }
+    assertThat(resolution).isNotNull();
+    assertThat(resolution.toString()).contains("Error.jsp");
+  }
 
-    @Test
-    void clearShouldResetCartAndWorkingItemId() {
-        cartActionBean.setWorkingItemId("EST-1");
+  @Test
+  void removeItemFromCart_WithBlankWorkingItemId_ShouldReturnError() {
+    cartActionBean.setWorkingItemId("   ");
 
-        cartActionBean.clear();
+    Resolution resolution = cartActionBean.removeItemFromCart();
 
-        assertThat(cartActionBean.getCart()).isNotNull();
-        assertThat(cartActionBean.getCart().getNumberOfItems()).isZero();
-    }
+    assertThat(resolution).isNotNull();
+    assertThat(resolution.toString()).contains("Error.jsp");
+  }
+
+  @Test
+  void removeItemFromCart_WithNonExistentItem_ShouldReturnError() {
+    cartActionBean.setWorkingItemId("NON_EXISTENT_ITEM");
+
+    Resolution resolution = cartActionBean.removeItemFromCart();
+
+    assertThat(resolution).isNotNull();
+    assertThat(resolution.toString()).contains("Error.jsp");
+  }
+
+  @Test
+  void removeItemFromCartWhenItemExistsRemovesItAndReturnsCartView() {
+    Item item = item("EST-1", "16.50");
+    cartActionBean.getCart().addItem(item, true);
+    cartActionBean.setWorkingItemId("EST-1");
+
+    Resolution resolution = cartActionBean.removeItemFromCart();
+
+    assertThat(resolution.toString()).contains("Cart.jsp");
+    assertThat(cartActionBean.getCart().containsItemId("EST-1")).isFalse();
+    assertThat(cartActionBean.getCart().getNumberOfItems()).isZero();
+  }
+
+  @Test
+  void updateCartQuantitiesAppliesNumericValuesAndRemovesItemsBelowOneFromVisibleList() {
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    Item keptItem = item("EST-1", "16.50");
+    Item removedItem = item("EST-2", "12.00");
+    cartActionBean.getCart().addItem(keptItem, true);
+    cartActionBean.getCart().addItem(removedItem, true);
+    when(mockContext.getRequest()).thenReturn(request);
+    when(request.getParameter("EST-1")).thenReturn("3");
+    when(request.getParameter("EST-2")).thenReturn("0");
+
+    Resolution resolution = cartActionBean.updateCartQuantities();
+
+    assertThat(resolution.toString()).contains("Cart.jsp");
+    assertThat(cartActionBean.getCart().containsItemId("EST-1")).isTrue();
+    assertThat(cartActionBean.getCart().containsItemId("EST-2")).isTrue();
+    assertThat(cartActionBean.getCart().getNumberOfItems()).isEqualTo(1);
+    assertThat(cartActionBean.getCart().getCartItemList()).extracting(cartItem -> cartItem.getItem().getItemId())
+        .containsExactly("EST-1");
+    assertThat(cartActionBean.getCart().getCartItemList().get(0).getQuantity()).isEqualTo(3);
+  }
+
+  @Test
+  void clearShouldResetCartAndWorkingItemId() {
+    cartActionBean.setWorkingItemId("EST-1");
+
+    cartActionBean.clear();
+
+    assertThat(cartActionBean.getCart()).isNotNull();
+    assertThat(cartActionBean.getCart().getNumberOfItems()).isZero();
+  }
+
+  private static Item item(String itemId, String price) {
+    Item item = new Item();
+    item.setItemId(itemId);
+    item.setListPrice(new BigDecimal(price));
+    return item;
+  }
 }

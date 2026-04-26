@@ -16,8 +16,32 @@
 package org.mybatis.jpetstore.web.actions;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import net.sourceforge.stripes.action.ActionBeanContext;
+import net.sourceforge.stripes.action.Message;
+import net.sourceforge.stripes.action.Resolution;
+import net.sourceforge.stripes.config.Configuration;
+import net.sourceforge.stripes.controller.ActionResolver;
+import net.sourceforge.stripes.controller.StripesFilter;
 
 import org.junit.jupiter.api.Test;
+import org.mybatis.jpetstore.domain.Account;
+import org.mybatis.jpetstore.domain.Cart;
+import org.mybatis.jpetstore.domain.Item;
+import org.mybatis.jpetstore.domain.Order;
+import org.mybatis.jpetstore.service.OrderService;
+import org.springframework.test.util.ReflectionTestUtils;
 
 class OrderActionBeanTest {
 
@@ -68,5 +92,170 @@ class OrderActionBeanTest {
     // Act and Assert result
     assertThat(orderActionBean.isConfirmed()).isFalse();
 
+  }
+
+  @Test
+  void listOrdersUsesAuthenticatedAccountUsernameFromSession() {
+    OrderActionBean orderActionBean = new OrderActionBean();
+    OrderService orderService = mock(OrderService.class);
+    HttpSession session = sessionFor(orderActionBean);
+    AccountActionBean accountBean = authenticatedAccountBean("j2ee");
+    List<Order> expectedOrders = List.of(new Order());
+
+    ReflectionTestUtils.setField(orderActionBean, "orderService", orderService);
+    when(session.getAttribute("/actions/Account.action")).thenReturn(accountBean);
+    when(orderService.getOrdersByUsername("j2ee")).thenReturn(expectedOrders);
+
+    Resolution resolution = orderActionBean.listOrders();
+
+    assertThat(resolution.toString()).contains("ListOrders.jsp");
+    assertThat(orderActionBean.getOrderList()).isSameAs(expectedOrders);
+  }
+
+  @Test
+  void newOrderFormCreatesOrderFromAuthenticatedAccountAndSessionCart() {
+    OrderActionBean orderActionBean = new OrderActionBean();
+    HttpSession session = sessionFor(orderActionBean);
+    AccountActionBean accountBean = authenticatedAccountBean("j2ee");
+    CartActionBean cartBean = cartBeanWithItem("EST-1", "16.50", 2);
+
+    when(session.getAttribute("/actions/Account.action")).thenReturn(accountBean);
+    when(session.getAttribute("/actions/Cart.action")).thenReturn(cartBean);
+
+    Resolution resolution = orderActionBean.newOrderForm();
+
+    assertThat(resolution.toString()).contains("NewOrderForm.jsp");
+    assertThat(orderActionBean.getOrder().getUsername()).isEqualTo("j2ee");
+    assertThat(orderActionBean.getOrder().getBillToFirstName()).isEqualTo("Jane");
+    assertThat(orderActionBean.getOrder().getShipToLastName()).isEqualTo("Doe");
+    assertThat(orderActionBean.getOrder().getTotalPrice()).isEqualTo(new BigDecimal("33.00"));
+    assertThat(orderActionBean.getOrder().getLineItems()).hasSize(1);
+    assertThat(orderActionBean.getOrder().getLineItems().get(0).getItemId()).isEqualTo("EST-1");
+    assertThat(orderActionBean.getOrder().getLineItems().get(0).getQuantity()).isEqualTo(2);
+  }
+
+  @Test
+  void newOrderFormRejectsUnauthenticatedCheckout() {
+    OrderActionBean orderActionBean = new OrderActionBean();
+    ActionBeanContext context = contextWithRequestAndMessages();
+    HttpSession session = context.getRequest().getSession();
+    AccountActionBean accountBean = new AccountActionBean();
+
+    orderActionBean.setContext(context);
+    when(session.getAttribute("/actions/Account.action")).thenReturn(accountBean);
+    configureStripesActionResolver();
+
+    Resolution resolution = orderActionBean.newOrderForm();
+
+    assertThat(resolution.toString()).contains("Account.action");
+    assertThat(context.getMessages()).extracting(message -> message.getMessage(Locale.getDefault())).containsExactly(
+        "You must sign on before attempting to check out.  Please sign on and try checking out again.");
+  }
+
+  @Test
+  void confirmedNewOrderSubmitsOrderClearsCartAndShowsSubmittedMessage() {
+    OrderActionBean orderActionBean = new OrderActionBean();
+    OrderService orderService = mock(OrderService.class);
+    ActionBeanContext context = contextWithRequestAndMessages();
+    HttpSession session = context.getRequest().getSession();
+    CartActionBean cartBean = cartBeanWithItem("EST-1", "16.50", 1);
+    Order order = new Order();
+
+    ReflectionTestUtils.setField(orderActionBean, "orderService", orderService);
+    orderActionBean.setContext(context);
+    orderActionBean.setOrder(order);
+    orderActionBean.setConfirmed(true);
+    when(session.getAttribute("/actions/Cart.action")).thenReturn(cartBean);
+
+    Resolution resolution = orderActionBean.newOrder();
+
+    assertThat(resolution.toString()).contains("ViewOrder.jsp");
+    verify(orderService).insertOrder(order);
+    assertThat(cartBean.getCart().getNumberOfItems()).isZero();
+    assertThat(context.getMessages()).extracting(message -> message.getMessage(Locale.getDefault()))
+        .containsExactly("Thank you, your order has been submitted.");
+  }
+
+  @Test
+  void viewOrderRejectsOrderOwnedByAnotherUser() {
+    OrderActionBean orderActionBean = new OrderActionBean();
+    OrderService orderService = mock(OrderService.class);
+    ActionBeanContext context = contextWithRequestAndMessages();
+    HttpSession session = context.getRequest().getSession();
+    Order persistedOrder = new Order();
+    persistedOrder.setOrderId(1001);
+    persistedOrder.setUsername("other-user");
+
+    ReflectionTestUtils.setField(orderActionBean, "orderService", orderService);
+    orderActionBean.setContext(context);
+    orderActionBean.setOrderId(1001);
+    when(session.getAttribute("accountBean")).thenReturn(authenticatedAccountBean("j2ee"));
+    when(orderService.getOrder(1001)).thenReturn(persistedOrder);
+
+    Resolution resolution = orderActionBean.viewOrder();
+
+    assertThat(resolution.toString()).contains("Error.jsp");
+    assertThat(orderActionBean.getOrder()).isNull();
+    assertThat(context.getMessages()).extracting(message -> message.getMessage(Locale.getDefault()))
+        .containsExactly("You may only view your own orders.");
+  }
+
+  @SuppressWarnings("unchecked")
+  private static void configureStripesActionResolver() {
+    Configuration configuration = mock(Configuration.class);
+    ActionResolver actionResolver = mock(ActionResolver.class);
+    ThreadLocal<Configuration> configurationStash = (ThreadLocal<Configuration>) ReflectionTestUtils
+        .getField(StripesFilter.class, "configurationStash");
+    when(configuration.getActionResolver()).thenReturn(actionResolver);
+    when(actionResolver.getUrlBinding(AccountActionBean.class)).thenReturn("/actions/Account.action");
+    configurationStash.set(configuration);
+  }
+
+  private static HttpSession sessionFor(OrderActionBean orderActionBean) {
+    ActionBeanContext context = contextWithRequestAndMessages();
+    orderActionBean.setContext(context);
+    return context.getRequest().getSession();
+  }
+
+  private static ActionBeanContext contextWithRequestAndMessages() {
+    ActionBeanContext context = mock(ActionBeanContext.class);
+    HttpServletRequest request = mock(HttpServletRequest.class);
+    HttpSession session = mock(HttpSession.class);
+    when(context.getRequest()).thenReturn(request);
+    when(context.getMessages()).thenReturn(new ArrayList<Message>());
+    when(request.getSession()).thenReturn(session);
+    return context;
+  }
+
+  private static AccountActionBean authenticatedAccountBean(String username) {
+    Account account = new Account();
+    account.setUsername(username);
+    account.setFirstName("Jane");
+    account.setLastName("Doe");
+    account.setAddress1("1 Main Street");
+    account.setAddress2("Apt 2");
+    account.setCity("Denver");
+    account.setState("CO");
+    account.setZip("80202");
+    account.setCountry("USA");
+
+    AccountActionBean accountBean = new AccountActionBean();
+    ReflectionTestUtils.setField(accountBean, "account", account);
+    ReflectionTestUtils.setField(accountBean, "authenticated", true);
+    return accountBean;
+  }
+
+  private static CartActionBean cartBeanWithItem(String itemId, String price, int quantity) {
+    Item item = new Item();
+    item.setItemId(itemId);
+    item.setListPrice(new BigDecimal(price));
+
+    Cart cart = new Cart();
+    cart.addItem(item, true);
+    cart.setQuantityByItemId(itemId, quantity);
+
+    CartActionBean cartBean = new CartActionBean();
+    cartBean.setCart(cart);
+    return cartBean;
   }
 }
