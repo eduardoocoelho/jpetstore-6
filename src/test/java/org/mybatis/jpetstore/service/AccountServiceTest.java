@@ -1,5 +1,5 @@
 /*
- *    Copyright 2010-2022 the original author or authors.
+ *    Copyright 2010-2026 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mybatis.jpetstore.account.api.AccountQueryService;
 import org.mybatis.jpetstore.domain.Account;
 import org.mybatis.jpetstore.mapper.AccountMapper;
 
@@ -39,6 +40,11 @@ class AccountServiceTest {
 
   @InjectMocks
   private AccountService accountService;
+
+  @Test
+  void shouldImplementAccountQueryServiceApi() {
+    assertThat(accountService).isInstanceOf(AccountQueryService.class);
+  }
 
   @Test
   void shouldCallTheMapperToInsertAnAccount() {
