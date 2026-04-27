@@ -21,6 +21,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,12 +31,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mybatis.jpetstore.catalog.api.CatalogQueryService;
-import org.mybatis.jpetstore.domain.Item;
+import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
+import org.mybatis.jpetstore.catalog.api.ProductSummary;
 import org.mybatis.jpetstore.domain.LineItem;
 import org.mybatis.jpetstore.domain.Order;
 import org.mybatis.jpetstore.domain.Sequence;
+import org.mybatis.jpetstore.inventory.api.InventoryQueryService;
 import org.mybatis.jpetstore.inventory.api.InventoryReservationService;
-import org.mybatis.jpetstore.inventory.persistence.InventoryMapper;
 import org.mybatis.jpetstore.mapper.LineItemMapper;
 import org.mybatis.jpetstore.mapper.OrderMapper;
 import org.mybatis.jpetstore.mapper.SequenceMapper;
@@ -50,7 +52,7 @@ class OrderServiceTest {
   @Mock
   private CatalogQueryService catalogQueryService;
   @Mock
-  private InventoryMapper inventoryMapper;
+  private InventoryQueryService inventoryQueryService;
   @Mock
   private InventoryReservationService inventoryReservationService;
   @Mock
@@ -98,14 +100,19 @@ class OrderServiceTest {
     // when
     when(orderMapper.getOrder(orderId)).thenReturn(order);
     when(lineItemMapper.getLineItemsByOrderId(orderId)).thenReturn(lineItems);
-    when(catalogQueryService.getItem(itemId)).thenReturn(new Item());
-    when(inventoryMapper.getInventoryQuantity(itemId)).thenReturn(5);
+    ProductSummary product = new ProductSummary("P01", "C01", "Angelfish", "Fresh Water fish from China");
+    ItemSnapshot itemSnapshot = new ItemSnapshot(itemId, "P01", product, new BigDecimal("16.50"), "P", "Large", null,
+        null, null, null);
+    when(catalogQueryService.getItemSnapshot(itemId)).thenReturn(itemSnapshot);
+    when(inventoryQueryService.getQuantity(itemId)).thenReturn(5);
 
     // then
     Order expectedOrder = orderService.getOrder(orderId);
     assertThat(expectedOrder).isEqualTo(order);
     assertThat(expectedOrder.getLineItems()).hasSize(1);
     assertThat(expectedOrder.getLineItems().get(0).getItem().getQuantity()).isEqualTo(5);
+    assertThat(expectedOrder.getLineItems().get(0).getItem().getItemId()).isEqualTo(itemId);
+    assertThat(expectedOrder.getLineItems().get(0).getItem().getProduct().getProductId()).isEqualTo("P01");
   }
 
   @Test
