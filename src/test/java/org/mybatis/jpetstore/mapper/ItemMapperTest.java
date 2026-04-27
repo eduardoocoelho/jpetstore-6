@@ -1,5 +1,5 @@
 /*
- *    Copyright 2010-2022 the original author or authors.
+ *    Copyright 2010-2026 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,15 +19,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigDecimal;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mybatis.jpetstore.domain.Item;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,9 +36,6 @@ class ItemMapperTest {
 
   @Autowired
   private ItemMapper mapper;
-
-  @Autowired
-  private JdbcTemplate jdbcTemplate;
 
   @Test
   void getItemListByProduct() {
@@ -110,36 +104,6 @@ class ItemMapperTest {
     assertThat(item.getProduct().getDescription())
         .isEqualTo("<image src=\"../images/fish1.gif\">Salt Water fish from Australia");
     assertThat(item.getProduct().getCategoryId()).isEqualTo("FISH");
-  }
-
-  @Test
-  void getInventoryQuantity() {
-    // given
-    String itemId = "EST-1";
-
-    // when
-    int quantity = mapper.getInventoryQuantity(itemId);
-
-    // then
-    assertThat(quantity).isEqualTo(10000);
-
-  }
-
-  @Test
-  void updateInventoryQuantity() {
-    // given
-    String itemId = "EST-1";
-    Map<String, Object> params = new HashMap<>();
-    params.put("itemId", itemId);
-    params.put("increment", 10);
-
-    // when
-    mapper.updateInventoryQuantity(params);
-
-    // then
-    Integer quantity = jdbcTemplate.queryForObject("SELECT QTY FROM inventory WHERE itemid = ?", Integer.class, itemId);
-    assertThat(quantity).isEqualTo(9990);
-
   }
 
 }

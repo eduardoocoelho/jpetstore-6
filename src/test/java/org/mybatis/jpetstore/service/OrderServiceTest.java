@@ -36,6 +36,7 @@ import org.mybatis.jpetstore.domain.LineItem;
 import org.mybatis.jpetstore.domain.Order;
 import org.mybatis.jpetstore.domain.Sequence;
 import org.mybatis.jpetstore.inventory.api.InventoryReservationService;
+import org.mybatis.jpetstore.inventory.persistence.InventoryMapper;
 import org.mybatis.jpetstore.mapper.ItemMapper;
 import org.mybatis.jpetstore.mapper.LineItemMapper;
 import org.mybatis.jpetstore.mapper.OrderMapper;
@@ -50,6 +51,8 @@ class OrderServiceTest {
 
   @Mock
   private ItemMapper itemMapper;
+  @Mock
+  private InventoryMapper inventoryMapper;
   @Mock
   private OrderMapper orderMapper;
   @Mock
@@ -96,7 +99,7 @@ class OrderServiceTest {
     when(orderMapper.getOrder(orderId)).thenReturn(order);
     when(lineItemMapper.getLineItemsByOrderId(orderId)).thenReturn(lineItems);
     when(itemMapper.getItem(itemId)).thenReturn(new Item());
-    when(itemMapper.getInventoryQuantity(itemId)).thenReturn(5);
+    when(inventoryMapper.getInventoryQuantity(itemId)).thenReturn(5);
 
     // then
     Order expectedOrder = orderService.getOrder(orderId);
@@ -182,7 +185,7 @@ class OrderServiceTest {
     verify(orderMapper).insertOrder(argThat(v -> v == order && v.getOrderId() == 100));
     verify(orderMapper).insertOrderStatus(eq(order));
     verify(lineItemMapper).insertLineItem(argThat(v -> v == item && v.getOrderId() == 100));
-    verify(itemMapper).updateInventoryQuantity(eq(expectedItemParam));
+    verify(inventoryMapper).updateInventoryQuantity(eq(expectedItemParam));
   }
 
   @Test
@@ -198,7 +201,7 @@ class OrderServiceTest {
     orderService.decrement(itemId, quantity);
 
     // then
-    verify(itemMapper).updateInventoryQuantity(eq(expectedItemParam));
+    verify(inventoryMapper).updateInventoryQuantity(eq(expectedItemParam));
   }
 
 }

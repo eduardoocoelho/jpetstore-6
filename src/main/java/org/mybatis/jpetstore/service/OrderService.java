@@ -23,6 +23,7 @@ import org.mybatis.jpetstore.domain.Item;
 import org.mybatis.jpetstore.domain.Order;
 import org.mybatis.jpetstore.domain.Sequence;
 import org.mybatis.jpetstore.inventory.api.InventoryReservationService;
+import org.mybatis.jpetstore.inventory.persistence.InventoryMapper;
 import org.mybatis.jpetstore.mapper.ItemMapper;
 import org.mybatis.jpetstore.mapper.LineItemMapper;
 import org.mybatis.jpetstore.mapper.OrderMapper;
@@ -40,13 +41,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrderService implements OrderQueryService, InventoryReservationService {
 
   private final ItemMapper itemMapper;
+  private final InventoryMapper inventoryMapper;
   private final OrderMapper orderMapper;
   private final SequenceMapper sequenceMapper;
   private final LineItemMapper lineItemMapper;
 
-  public OrderService(ItemMapper itemMapper, OrderMapper orderMapper, SequenceMapper sequenceMapper,
-      LineItemMapper lineItemMapper) {
+  public OrderService(ItemMapper itemMapper, InventoryMapper inventoryMapper, OrderMapper orderMapper,
+      SequenceMapper sequenceMapper, LineItemMapper lineItemMapper) {
     this.itemMapper = itemMapper;
+    this.inventoryMapper = inventoryMapper;
     this.orderMapper = orderMapper;
     this.sequenceMapper = sequenceMapper;
     this.lineItemMapper = lineItemMapper;
@@ -78,7 +81,7 @@ public class OrderService implements OrderQueryService, InventoryReservationServ
     Map<String, Object> param = new HashMap<>(2);
     param.put("itemId", itemId);
     param.put("increment", quantity);
-    itemMapper.updateInventoryQuantity(param);
+    inventoryMapper.updateInventoryQuantity(param);
   }
 
   /**
@@ -97,7 +100,7 @@ public class OrderService implements OrderQueryService, InventoryReservationServ
 
     order.getLineItems().forEach(lineItem -> {
       Item item = itemMapper.getItem(lineItem.getItemId());
-      item.setQuantity(itemMapper.getInventoryQuantity(lineItem.getItemId()));
+      item.setQuantity(inventoryMapper.getInventoryQuantity(lineItem.getItemId()));
       lineItem.setItem(item);
     });
 

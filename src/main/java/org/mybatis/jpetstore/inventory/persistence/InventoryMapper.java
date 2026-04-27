@@ -13,21 +13,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.mybatis.jpetstore.mapper;
+package org.mybatis.jpetstore.inventory.persistence;
 
-import java.util.List;
+import java.util.Map;
 
-import org.mybatis.jpetstore.domain.Item;
+public interface InventoryMapper {
 
-/**
- * The Interface ItemMapper.
- *
- * @author Eduardo Macarron
- */
-public interface ItemMapper {
+  int getInventoryQuantity(String itemId);
 
-  List<Item> getItemListByProduct(String productId);
-
-  Item getItem(String itemId);
+  void updateInventoryQuantity(Map<String, Object> param);
 
 }

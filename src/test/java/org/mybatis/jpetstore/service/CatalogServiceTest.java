@@ -34,6 +34,7 @@ import org.mybatis.jpetstore.domain.Item;
 import org.mybatis.jpetstore.domain.Product;
 import org.mybatis.jpetstore.inventory.api.InventoryQueryService;
 import org.mybatis.jpetstore.inventory.api.InventoryStatus;
+import org.mybatis.jpetstore.inventory.persistence.InventoryMapper;
 import org.mybatis.jpetstore.mapper.CategoryMapper;
 import org.mybatis.jpetstore.mapper.ItemMapper;
 import org.mybatis.jpetstore.mapper.ProductMapper;
@@ -50,6 +51,8 @@ class CatalogServiceTest {
   private CategoryMapper categoryMapper;
   @Mock
   private ItemMapper itemMapper;
+  @Mock
+  private InventoryMapper inventoryMapper;
 
   @InjectMocks
   private CatalogService catalogService;
@@ -251,7 +254,7 @@ class CatalogServiceTest {
     String itemCode = "I01";
 
     // when
-    when(itemMapper.getInventoryQuantity(itemCode)).thenReturn(1);
+    when(inventoryMapper.getInventoryQuantity(itemCode)).thenReturn(1);
     boolean result = catalogService.isItemInStock(itemCode);
 
     // then
@@ -266,7 +269,7 @@ class CatalogServiceTest {
     String itemCode = "I01";
 
     // when
-    when(itemMapper.getInventoryQuantity(itemCode)).thenReturn(0);
+    when(inventoryMapper.getInventoryQuantity(itemCode)).thenReturn(0);
     boolean result = catalogService.isItemInStock(itemCode);
 
     // then
@@ -280,7 +283,7 @@ class CatalogServiceTest {
     String itemCode = "I01";
 
     // when
-    when(itemMapper.getInventoryQuantity(itemCode)).thenReturn(3);
+    when(inventoryMapper.getInventoryQuantity(itemCode)).thenReturn(3);
     InventoryStatus inventoryStatus = catalogService.getInventoryStatus(itemCode);
 
     // then

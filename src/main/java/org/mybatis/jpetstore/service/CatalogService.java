@@ -26,6 +26,7 @@ import org.mybatis.jpetstore.domain.Item;
 import org.mybatis.jpetstore.domain.Product;
 import org.mybatis.jpetstore.inventory.api.InventoryQueryService;
 import org.mybatis.jpetstore.inventory.api.InventoryStatus;
+import org.mybatis.jpetstore.inventory.persistence.InventoryMapper;
 import org.mybatis.jpetstore.mapper.CategoryMapper;
 import org.mybatis.jpetstore.mapper.ItemMapper;
 import org.mybatis.jpetstore.mapper.ProductMapper;
@@ -41,11 +42,14 @@ public class CatalogService implements CatalogQueryService, InventoryQueryServic
 
   private final CategoryMapper categoryMapper;
   private final ItemMapper itemMapper;
+  private final InventoryMapper inventoryMapper;
   private final ProductMapper productMapper;
 
-  public CatalogService(CategoryMapper categoryMapper, ItemMapper itemMapper, ProductMapper productMapper) {
+  public CatalogService(CategoryMapper categoryMapper, ItemMapper itemMapper, InventoryMapper inventoryMapper,
+      ProductMapper productMapper) {
     this.categoryMapper = categoryMapper;
     this.itemMapper = itemMapper;
+    this.inventoryMapper = inventoryMapper;
     this.productMapper = productMapper;
   }
 
@@ -113,12 +117,12 @@ public class CatalogService implements CatalogQueryService, InventoryQueryServic
 
   @Override
   public boolean isItemInStock(String itemId) {
-    return itemMapper.getInventoryQuantity(itemId) > 0;
+    return inventoryMapper.getInventoryQuantity(itemId) > 0;
   }
 
   @Override
   public InventoryStatus getInventoryStatus(String itemId) {
-    int quantity = itemMapper.getInventoryQuantity(itemId);
+    int quantity = inventoryMapper.getInventoryQuantity(itemId);
     return new InventoryStatus(itemId, quantity, quantity > 0);
   }
 
