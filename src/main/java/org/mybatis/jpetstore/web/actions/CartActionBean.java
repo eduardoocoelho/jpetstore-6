@@ -24,11 +24,10 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.SessionScope;
 import net.sourceforge.stripes.integration.spring.SpringBean;
 
-import org.mybatis.jpetstore.catalog.api.CatalogQueryService;
+import org.mybatis.jpetstore.cart.application.CartService;
 import org.mybatis.jpetstore.domain.Cart;
 import org.mybatis.jpetstore.domain.CartItem;
 import org.mybatis.jpetstore.domain.Item;
-import org.mybatis.jpetstore.inventory.api.InventoryQueryService;
 
 /**
  * The Class CartActionBean.
@@ -44,9 +43,7 @@ public class CartActionBean extends AbstractActionBean {
   private static final String CHECK_OUT = "/WEB-INF/jsp/cart/Checkout.jsp";
 
   @SpringBean
-  private transient CatalogQueryService catalogQueryService;
-  @SpringBean
-  private transient InventoryQueryService inventoryQueryService;
+  private transient CartService cartService;
 
   private Cart cart = new Cart();
   private String workingItemId;
@@ -75,16 +72,7 @@ public class CartActionBean extends AbstractActionBean {
       return new ForwardResolution(ERROR);
     }
 
-    if (cart.containsItemId(workingItemId)) {
-      cart.incrementQuantityByItemId(workingItemId);
-    } else {
-      // isInStock is a "real-time" property that must be updated
-      // every time an item is added to the cart, even if other
-      // item details are cached.
-      boolean isInStock = inventoryQueryService.isInStock(workingItemId);
-      Item item = catalogQueryService.getItem(workingItemId);
-      cart.addItem(item, isInStock);
-    }
+    cartService.addItem(cart, workingItemId);
 
     return new ForwardResolution(VIEW_CART);
   }
