@@ -26,7 +26,6 @@ import org.mybatis.jpetstore.domain.Item;
 import org.mybatis.jpetstore.domain.Product;
 import org.mybatis.jpetstore.inventory.api.InventoryQueryService;
 import org.mybatis.jpetstore.inventory.api.InventoryStatus;
-import org.mybatis.jpetstore.inventory.persistence.InventoryMapper;
 import org.mybatis.jpetstore.mapper.CategoryMapper;
 import org.mybatis.jpetstore.mapper.ItemMapper;
 import org.mybatis.jpetstore.mapper.ProductMapper;
@@ -38,18 +37,18 @@ import org.springframework.stereotype.Service;
  * @author Eduardo Macarron
  */
 @Service
-public class CatalogService implements CatalogQueryService, InventoryQueryService {
+public class CatalogService implements CatalogQueryService {
 
   private final CategoryMapper categoryMapper;
   private final ItemMapper itemMapper;
-  private final InventoryMapper inventoryMapper;
+  private final InventoryQueryService inventoryQueryService;
   private final ProductMapper productMapper;
 
-  public CatalogService(CategoryMapper categoryMapper, ItemMapper itemMapper, InventoryMapper inventoryMapper,
-      ProductMapper productMapper) {
+  public CatalogService(CategoryMapper categoryMapper, ItemMapper itemMapper,
+      InventoryQueryService inventoryQueryService, ProductMapper productMapper) {
     this.categoryMapper = categoryMapper;
     this.itemMapper = itemMapper;
-    this.inventoryMapper = inventoryMapper;
+    this.inventoryQueryService = inventoryQueryService;
     this.productMapper = productMapper;
   }
 
@@ -115,15 +114,12 @@ public class CatalogService implements CatalogQueryService, InventoryQueryServic
     return toItemSnapshot(getItem(itemId));
   }
 
-  @Override
   public boolean isItemInStock(String itemId) {
-    return inventoryMapper.getInventoryQuantity(itemId) > 0;
+    return inventoryQueryService.isInStock(itemId);
   }
 
-  @Override
   public InventoryStatus getInventoryStatus(String itemId) {
-    int quantity = inventoryMapper.getInventoryQuantity(itemId);
-    return new InventoryStatus(itemId, quantity, quantity > 0);
+    return inventoryQueryService.getInventoryStatus(itemId);
   }
 
   private static ProductSummary toProductSummary(Product product) {

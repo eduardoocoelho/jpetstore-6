@@ -34,7 +34,6 @@ import org.mybatis.jpetstore.domain.Item;
 import org.mybatis.jpetstore.domain.Product;
 import org.mybatis.jpetstore.inventory.api.InventoryQueryService;
 import org.mybatis.jpetstore.inventory.api.InventoryStatus;
-import org.mybatis.jpetstore.inventory.persistence.InventoryMapper;
 import org.mybatis.jpetstore.mapper.CategoryMapper;
 import org.mybatis.jpetstore.mapper.ItemMapper;
 import org.mybatis.jpetstore.mapper.ProductMapper;
@@ -52,14 +51,14 @@ class CatalogServiceTest {
   @Mock
   private ItemMapper itemMapper;
   @Mock
-  private InventoryMapper inventoryMapper;
+  private InventoryQueryService inventoryQueryService;
 
   @InjectMocks
   private CatalogService catalogService;
 
   @Test
-  void shouldImplementCatalogAndInventoryQueryServiceApis() {
-    assertThat(catalogService).isInstanceOf(CatalogQueryService.class).isInstanceOf(InventoryQueryService.class);
+  void shouldImplementCatalogQueryServiceApi() {
+    assertThat(catalogService).isInstanceOf(CatalogQueryService.class);
   }
 
   @Test
@@ -254,7 +253,7 @@ class CatalogServiceTest {
     String itemCode = "I01";
 
     // when
-    when(inventoryMapper.getInventoryQuantity(itemCode)).thenReturn(1);
+    when(inventoryQueryService.isInStock(itemCode)).thenReturn(true);
     boolean result = catalogService.isItemInStock(itemCode);
 
     // then
@@ -269,7 +268,7 @@ class CatalogServiceTest {
     String itemCode = "I01";
 
     // when
-    when(inventoryMapper.getInventoryQuantity(itemCode)).thenReturn(0);
+    when(inventoryQueryService.isInStock(itemCode)).thenReturn(false);
     boolean result = catalogService.isItemInStock(itemCode);
 
     // then
@@ -283,7 +282,7 @@ class CatalogServiceTest {
     String itemCode = "I01";
 
     // when
-    when(inventoryMapper.getInventoryQuantity(itemCode)).thenReturn(3);
+    when(inventoryQueryService.getInventoryStatus(itemCode)).thenReturn(new InventoryStatus(itemCode, 3, true));
     InventoryStatus inventoryStatus = catalogService.getInventoryStatus(itemCode);
 
     // then
