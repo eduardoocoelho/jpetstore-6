@@ -15,9 +15,7 @@
  */
 package org.mybatis.jpetstore.service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.mybatis.jpetstore.domain.Item;
 import org.mybatis.jpetstore.domain.Order;
@@ -38,18 +36,21 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Eduardo Macarron
  */
 @Service
-public class OrderService implements OrderQueryService, InventoryReservationService {
+public class OrderService implements OrderQueryService {
 
   private final ItemMapper itemMapper;
   private final InventoryMapper inventoryMapper;
+  private final InventoryReservationService inventoryReservationService;
   private final OrderMapper orderMapper;
   private final SequenceMapper sequenceMapper;
   private final LineItemMapper lineItemMapper;
 
-  public OrderService(ItemMapper itemMapper, InventoryMapper inventoryMapper, OrderMapper orderMapper,
-      SequenceMapper sequenceMapper, LineItemMapper lineItemMapper) {
+  public OrderService(ItemMapper itemMapper, InventoryMapper inventoryMapper,
+      InventoryReservationService inventoryReservationService, OrderMapper orderMapper, SequenceMapper sequenceMapper,
+      LineItemMapper lineItemMapper) {
     this.itemMapper = itemMapper;
     this.inventoryMapper = inventoryMapper;
+    this.inventoryReservationService = inventoryReservationService;
     this.orderMapper = orderMapper;
     this.sequenceMapper = sequenceMapper;
     this.lineItemMapper = lineItemMapper;
@@ -65,7 +66,7 @@ public class OrderService implements OrderQueryService, InventoryReservationServ
   public void insertOrder(Order order) {
     order.setOrderId(getNextId("ordernum"));
     order.getLineItems().forEach(lineItem -> {
-      decrement(lineItem.getItemId(), lineItem.getQuantity());
+      inventoryReservationService.decrement(lineItem.getItemId(), lineItem.getQuantity());
     });
 
     orderMapper.insertOrder(order);
@@ -74,14 +75,6 @@ public class OrderService implements OrderQueryService, InventoryReservationServ
       lineItem.setOrderId(order.getOrderId());
       lineItemMapper.insertLineItem(lineItem);
     });
-  }
-
-  @Override
-  public void decrement(String itemId, int quantity) {
-    Map<String, Object> param = new HashMap<>(2);
-    param.put("itemId", itemId);
-    param.put("increment", quantity);
-    inventoryMapper.updateInventoryQuantity(param);
   }
 
   /**

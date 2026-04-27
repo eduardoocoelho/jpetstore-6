@@ -22,9 +22,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,6 +52,8 @@ class OrderServiceTest {
   @Mock
   private InventoryMapper inventoryMapper;
   @Mock
+  private InventoryReservationService inventoryReservationService;
+  @Mock
   private OrderMapper orderMapper;
   @Mock
   private LineItemMapper lineItemMapper;
@@ -64,8 +64,8 @@ class OrderServiceTest {
   private OrderService orderService;
 
   @Test
-  void shouldImplementOrderQueryAndInventoryReservationServiceApis() {
-    assertThat(orderService).isInstanceOf(OrderQueryService.class).isInstanceOf(InventoryReservationService.class);
+  void shouldImplementOrderQueryServiceApi() {
+    assertThat(orderService).isInstanceOf(OrderQueryService.class);
   }
 
   @Test
@@ -173,10 +173,6 @@ class OrderServiceTest {
 
     Sequence orderNumSequence = new Sequence("ordernum", 100);
 
-    Map<String, Object> expectedItemParam = new HashMap<>(2);
-    expectedItemParam.put("itemId", itemId);
-    expectedItemParam.put("increment", quantity);
-
     // when
     when(sequenceMapper.getSequence(any())).thenReturn(orderNumSequence);
     orderService.insertOrder(order);
@@ -185,23 +181,7 @@ class OrderServiceTest {
     verify(orderMapper).insertOrder(argThat(v -> v == order && v.getOrderId() == 100));
     verify(orderMapper).insertOrderStatus(eq(order));
     verify(lineItemMapper).insertLineItem(argThat(v -> v == item && v.getOrderId() == 100));
-    verify(inventoryMapper).updateInventoryQuantity(eq(expectedItemParam));
-  }
-
-  @Test
-  void shouldDecrementInventoryThroughReservationApi() {
-    // given
-    String itemId = "I01";
-    int quantity = 4;
-    Map<String, Object> expectedItemParam = new HashMap<>(2);
-    expectedItemParam.put("itemId", itemId);
-    expectedItemParam.put("increment", quantity);
-
-    // when
-    orderService.decrement(itemId, quantity);
-
-    // then
-    verify(inventoryMapper).updateInventoryQuantity(eq(expectedItemParam));
+    verify(inventoryReservationService).decrement(itemId, quantity);
   }
 
 }
