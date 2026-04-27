@@ -1,5 +1,5 @@
 /*
- *    Copyright 2010-2022 the original author or authors.
+ *    Copyright 2010-2026 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -19,15 +19,16 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.servlet.http.HttpSession;
-
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.SessionScope;
 import net.sourceforge.stripes.integration.spring.SpringBean;
 
+import org.mybatis.jpetstore.account.api.CustomerProfile;
+import org.mybatis.jpetstore.cart.api.CartSnapshot;
 import org.mybatis.jpetstore.domain.Order;
 import org.mybatis.jpetstore.service.OrderService;
+import org.mybatis.jpetstore.shared.web.SessionState;
 
 /**
  * The Class OrderActionBean.
@@ -105,9 +106,7 @@ public class OrderActionBean extends AbstractActionBean {
    * @return the resolution
    */
   public Resolution listOrders() {
-    HttpSession session = context.getRequest().getSession();
-    AccountActionBean accountBean = (AccountActionBean) session.getAttribute("/actions/Account.action");
-    orderList = orderService.getOrdersByUsername(accountBean.getAccount().getUsername());
+    orderList = orderService.getOrdersByUsername(getSessionState().getCurrentUsername());
     return new ForwardResolution(LIST_ORDERS);
   }
 
@@ -117,16 +116,16 @@ public class OrderActionBean extends AbstractActionBean {
    * @return the resolution
    */
   public Resolution newOrderForm() {
-    HttpSession session = context.getRequest().getSession();
-    AccountActionBean accountBean = (AccountActionBean) session.getAttribute("/actions/Account.action");
-    CartActionBean cartBean = (CartActionBean) session.getAttribute("/actions/Cart.action");
+    SessionState sessionState = getSessionState();
+    CustomerProfile customer = sessionState.getCurrentCustomerProfile();
+    CartSnapshot cart = sessionState.getCurrentCartSnapshot();
 
     clear();
-    if (accountBean == null || !accountBean.isAuthenticated()) {
+    if (!sessionState.isAuthenticated()) {
       setMessage("You must sign on before attempting to check out.  Please sign on and try checking out again.");
       return new ForwardResolution(AccountActionBean.class);
-    } else if (cartBean != null) {
-      order.initOrder(accountBean.getAccount(), cartBean.getCart());
+    } else if (cart != null) {
+      order.initOrder(customer, cart);
       return new ForwardResolution(NEW_ORDER);
     } else {
       setMessage("An order could not be created because a cart could not be found.");
@@ -140,8 +139,6 @@ public class OrderActionBean extends AbstractActionBean {
    * @return the resolution
    */
   public Resolution newOrder() {
-    HttpSession session = context.getRequest().getSession();
-
     if (shippingAddressRequired) {
       shippingAddressRequired = false;
       return new ForwardResolution(SHIPPING);
@@ -151,8 +148,7 @@ public class OrderActionBean extends AbstractActionBean {
 
       orderService.insertOrder(order);
 
-      CartActionBean cartBean = (CartActionBean) session.getAttribute("/actions/Cart.action");
-      cartBean.clear();
+      getSessionState().clearCart();
 
       setMessage("Thank you, your order has been submitted.");
 
@@ -169,13 +165,10 @@ public class OrderActionBean extends AbstractActionBean {
    * @return the resolution
    */
   public Resolution viewOrder() {
-    HttpSession session = context.getRequest().getSession();
-
-    AccountActionBean accountBean = (AccountActionBean) session.getAttribute("accountBean");
-
+    String currentUsername = getSessionState().getCurrentUsername();
     order = orderService.getOrder(order.getOrderId());
 
-    if (accountBean.getAccount().getUsername().equals(order.getUsername())) {
+    if (currentUsername != null && currentUsername.equals(order.getUsername())) {
       return new ForwardResolution(VIEW_ORDER);
     } else {
       order = null;
@@ -192,6 +185,10 @@ public class OrderActionBean extends AbstractActionBean {
     shippingAddressRequired = false;
     confirmed = false;
     orderList = null;
+  }
+
+  private SessionState getSessionState() {
+    return new SessionState(context.getRequest().getSession());
   }
 
 }
