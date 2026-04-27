@@ -78,8 +78,13 @@ public class CatalogService implements CatalogQueryService {
   }
 
   @Override
-  public List<ProductSummary> getProductSummariesByCategory(String categoryId) {
+  public List<ProductSummary> getProductsByCategory(String categoryId) {
     return getProductListByCategory(categoryId).stream().map(CatalogService::toProductSummary).toList();
+  }
+
+  @Override
+  public List<ProductSummary> getProductSummariesByCategory(String categoryId) {
+    return getProductsByCategory(categoryId);
   }
 
   /**

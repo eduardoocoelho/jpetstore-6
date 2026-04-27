@@ -17,12 +17,12 @@ package org.mybatis.jpetstore.service;
 
 import java.util.List;
 
+import org.mybatis.jpetstore.catalog.api.CatalogQueryService;
 import org.mybatis.jpetstore.domain.Item;
 import org.mybatis.jpetstore.domain.Order;
 import org.mybatis.jpetstore.domain.Sequence;
 import org.mybatis.jpetstore.inventory.api.InventoryReservationService;
 import org.mybatis.jpetstore.inventory.persistence.InventoryMapper;
-import org.mybatis.jpetstore.mapper.ItemMapper;
 import org.mybatis.jpetstore.mapper.LineItemMapper;
 import org.mybatis.jpetstore.mapper.OrderMapper;
 import org.mybatis.jpetstore.mapper.SequenceMapper;
@@ -38,17 +38,17 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class OrderService implements OrderQueryService {
 
-  private final ItemMapper itemMapper;
+  private final CatalogQueryService catalogQueryService;
   private final InventoryMapper inventoryMapper;
   private final InventoryReservationService inventoryReservationService;
   private final OrderMapper orderMapper;
   private final SequenceMapper sequenceMapper;
   private final LineItemMapper lineItemMapper;
 
-  public OrderService(ItemMapper itemMapper, InventoryMapper inventoryMapper,
+  public OrderService(CatalogQueryService catalogQueryService, InventoryMapper inventoryMapper,
       InventoryReservationService inventoryReservationService, OrderMapper orderMapper, SequenceMapper sequenceMapper,
       LineItemMapper lineItemMapper) {
-    this.itemMapper = itemMapper;
+    this.catalogQueryService = catalogQueryService;
     this.inventoryMapper = inventoryMapper;
     this.inventoryReservationService = inventoryReservationService;
     this.orderMapper = orderMapper;
@@ -92,7 +92,7 @@ public class OrderService implements OrderQueryService {
     order.setLineItems(lineItemMapper.getLineItemsByOrderId(orderId));
 
     order.getLineItems().forEach(lineItem -> {
-      Item item = itemMapper.getItem(lineItem.getItemId());
+      Item item = catalogQueryService.getItem(lineItem.getItemId());
       item.setQuantity(inventoryMapper.getInventoryQuantity(lineItem.getItemId()));
       lineItem.setItem(item);
     });

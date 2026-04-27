@@ -31,6 +31,8 @@ public interface CatalogQueryService {
 
   ProductSummary getProductSummary(String productId);
 
+  List<ProductSummary> getProductsByCategory(String categoryId);
+
   List<Product> getProductListByCategory(String categoryId);
 
   List<ProductSummary> getProductSummariesByCategory(String categoryId);

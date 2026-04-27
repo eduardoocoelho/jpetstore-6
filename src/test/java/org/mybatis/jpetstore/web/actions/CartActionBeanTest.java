@@ -32,10 +32,10 @@ import net.sourceforge.stripes.action.Resolution;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mybatis.jpetstore.catalog.api.CatalogQueryService;
 import org.mybatis.jpetstore.domain.Cart;
 import org.mybatis.jpetstore.domain.Item;
 import org.mybatis.jpetstore.inventory.api.InventoryQueryService;
-import org.mybatis.jpetstore.service.CatalogService;
 import org.springframework.test.util.ReflectionTestUtils;
 
 class CartActionBeanTest {
@@ -102,13 +102,13 @@ class CartActionBeanTest {
 
   @Test
   void addItemToCartWhenItemIsAbsentLoadsItemFromCatalogAndStockFromInventory() {
-    CatalogService catalogService = mock(CatalogService.class);
+    CatalogQueryService catalogQueryService = mock(CatalogQueryService.class);
     InventoryQueryService inventoryQueryService = mock(InventoryQueryService.class);
     Item item = item("EST-1", "16.50");
-    ReflectionTestUtils.setField(cartActionBean, "catalogService", catalogService);
+    ReflectionTestUtils.setField(cartActionBean, "catalogQueryService", catalogQueryService);
     ReflectionTestUtils.setField(cartActionBean, "inventoryQueryService", inventoryQueryService);
     when(inventoryQueryService.isInStock("EST-1")).thenReturn(true);
-    when(catalogService.getItem("EST-1")).thenReturn(item);
+    when(catalogQueryService.getItem("EST-1")).thenReturn(item);
     cartActionBean.setWorkingItemId("EST-1");
 
     Resolution resolution = cartActionBean.addItemToCart();
@@ -122,11 +122,11 @@ class CartActionBeanTest {
 
   @Test
   void addItemToCartWhenItemIsAlreadyPresentOnlyIncrementsQuantity() {
-    CatalogService catalogService = mock(CatalogService.class);
+    CatalogQueryService catalogQueryService = mock(CatalogQueryService.class);
     InventoryQueryService inventoryQueryService = mock(InventoryQueryService.class);
     Item item = item("EST-1", "16.50");
     cartActionBean.getCart().addItem(item, true);
-    ReflectionTestUtils.setField(cartActionBean, "catalogService", catalogService);
+    ReflectionTestUtils.setField(cartActionBean, "catalogQueryService", catalogQueryService);
     ReflectionTestUtils.setField(cartActionBean, "inventoryQueryService", inventoryQueryService);
     cartActionBean.setWorkingItemId("EST-1");
 
@@ -135,7 +135,7 @@ class CartActionBeanTest {
     assertThat(resolution.toString()).contains("Cart.jsp");
     assertThat(cartActionBean.getCart().getCartItemList().get(0).getQuantity()).isEqualTo(2);
     verify(inventoryQueryService, never()).isInStock("EST-1");
-    verify(catalogService, never()).getItem("EST-1");
+    verify(catalogQueryService, never()).getItem("EST-1");
   }
 
   @Test

@@ -29,13 +29,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mybatis.jpetstore.catalog.api.CatalogQueryService;
 import org.mybatis.jpetstore.domain.Item;
 import org.mybatis.jpetstore.domain.LineItem;
 import org.mybatis.jpetstore.domain.Order;
 import org.mybatis.jpetstore.domain.Sequence;
 import org.mybatis.jpetstore.inventory.api.InventoryReservationService;
 import org.mybatis.jpetstore.inventory.persistence.InventoryMapper;
-import org.mybatis.jpetstore.mapper.ItemMapper;
 import org.mybatis.jpetstore.mapper.LineItemMapper;
 import org.mybatis.jpetstore.mapper.OrderMapper;
 import org.mybatis.jpetstore.mapper.SequenceMapper;
@@ -48,7 +48,7 @@ import org.mybatis.jpetstore.order.api.OrderQueryService;
 class OrderServiceTest {
 
   @Mock
-  private ItemMapper itemMapper;
+  private CatalogQueryService catalogQueryService;
   @Mock
   private InventoryMapper inventoryMapper;
   @Mock
@@ -98,7 +98,7 @@ class OrderServiceTest {
     // when
     when(orderMapper.getOrder(orderId)).thenReturn(order);
     when(lineItemMapper.getLineItemsByOrderId(orderId)).thenReturn(lineItems);
-    when(itemMapper.getItem(itemId)).thenReturn(new Item());
+    when(catalogQueryService.getItem(itemId)).thenReturn(new Item());
     when(inventoryMapper.getInventoryQuantity(itemId)).thenReturn(5);
 
     // then

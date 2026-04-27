@@ -184,6 +184,25 @@ class CatalogServiceTest {
   }
 
   @Test
+  void shouldExposeProductsByCategoryAsProductSummaries() {
+    // given
+    String categoryId = "C01";
+    Product product = new Product();
+    product.setProductId("P01");
+    product.setCategoryId(categoryId);
+    product.setName("Angelfish");
+    product.setDescription("Fresh Water fish from China");
+
+    // when
+    when(productMapper.getProductListByCategory(categoryId)).thenReturn(List.of(product));
+    List<ProductSummary> products = catalogService.getProductsByCategory(categoryId);
+
+    // then
+    assertThat(products)
+        .containsExactly(new ProductSummary("P01", categoryId, "Angelfish", "Fresh Water fish from China"));
+  }
+
+  @Test
   void shouldReturnItemList() {
     // given
     String productId = "P01";
