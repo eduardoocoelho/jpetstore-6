@@ -40,6 +40,7 @@ import org.mybatis.jpetstore.domain.Account;
 import org.mybatis.jpetstore.domain.Cart;
 import org.mybatis.jpetstore.domain.Item;
 import org.mybatis.jpetstore.domain.Order;
+import org.mybatis.jpetstore.order.application.OrderFactory;
 import org.mybatis.jpetstore.service.OrderService;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -119,6 +120,7 @@ class OrderActionBeanTest {
     AccountActionBean accountBean = authenticatedAccountBean("j2ee");
     CartActionBean cartBean = cartBeanWithItem("EST-1", "16.50", 2);
 
+    ReflectionTestUtils.setField(orderActionBean, "orderFactory", new OrderFactory());
     when(session.getAttribute("/actions/Account.action")).thenReturn(accountBean);
     when(session.getAttribute("/actions/Cart.action")).thenReturn(cartBean);
 

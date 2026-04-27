@@ -22,12 +22,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import org.mybatis.jpetstore.account.api.CustomerProfile;
-import org.mybatis.jpetstore.cart.api.CartLineSnapshot;
-import org.mybatis.jpetstore.cart.api.CartSnapshot;
-import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
-import org.mybatis.jpetstore.catalog.api.ProductSummary;
-
 /**
  * The Class Order.
  *
@@ -284,11 +278,15 @@ public class Order implements Serializable {
   /**
    * Inits the order.
    *
+   * @deprecated transitional compatibility path. New checkout code should use
+   *             {@code OrderFactory#createOrder(CustomerProfile, CartSnapshot)}.
+   *
    * @param account
    *          the account
    * @param cart
    *          the cart
    */
+  @Deprecated
   public void initOrder(Account account, Cart cart) {
 
     username = account.getUsername();
@@ -329,85 +327,13 @@ public class Order implements Serializable {
 
   }
 
-  public void initOrder(CustomerProfile customer, CartSnapshot cart) {
-
-    username = customer.username();
-    orderDate = new Date();
-
-    shipToFirstName = customer.firstName();
-    shipToLastName = customer.lastName();
-    shipAddress1 = customer.address1();
-    shipAddress2 = customer.address2();
-    shipCity = customer.city();
-    shipState = customer.state();
-    shipZip = customer.zip();
-    shipCountry = customer.country();
-
-    billToFirstName = customer.firstName();
-    billToLastName = customer.lastName();
-    billAddress1 = customer.address1();
-    billAddress2 = customer.address2();
-    billCity = customer.city();
-    billState = customer.state();
-    billZip = customer.zip();
-    billCountry = customer.country();
-
-    totalPrice = cart.subTotal();
-
-    creditCard = "999 9999 9999 9999";
-    expiryDate = "12/03";
-    cardType = "Visa";
-    courier = "UPS";
-    locale = "CA";
-    status = "P";
-
-    cart.lines().forEach(this::addLineItem);
-  }
-
   public void addLineItem(CartItem cartItem) {
     LineItem lineItem = new LineItem(lineItems.size() + 1, cartItem);
     addLineItem(lineItem);
   }
 
-  public void addLineItem(CartLineSnapshot cartLine) {
-    LineItem lineItem = new LineItem();
-    Item item = toItem(cartLine.item());
-    lineItem.setLineNumber(lineItems.size() + 1);
-    lineItem.setItemId(item.getItemId());
-    lineItem.setUnitPrice(item.getListPrice());
-    lineItem.setQuantity(cartLine.quantity());
-    lineItem.setItem(item);
-    addLineItem(lineItem);
-  }
-
   public void addLineItem(LineItem lineItem) {
     lineItems.add(lineItem);
-  }
-
-  private static Item toItem(ItemSnapshot itemSnapshot) {
-    Item item = new Item();
-    item.setItemId(itemSnapshot.itemId());
-    item.setProduct(toProduct(itemSnapshot.product()));
-    item.setListPrice(itemSnapshot.listPrice());
-    item.setStatus(itemSnapshot.status());
-    item.setAttribute1(itemSnapshot.attribute1());
-    item.setAttribute2(itemSnapshot.attribute2());
-    item.setAttribute3(itemSnapshot.attribute3());
-    item.setAttribute4(itemSnapshot.attribute4());
-    item.setAttribute5(itemSnapshot.attribute5());
-    return item;
-  }
-
-  private static Product toProduct(ProductSummary productSummary) {
-    if (productSummary == null) {
-      return null;
-    }
-    Product product = new Product();
-    product.setProductId(productSummary.productId());
-    product.setCategoryId(productSummary.categoryId());
-    product.setName(productSummary.name());
-    product.setDescription(productSummary.description());
-    return product;
   }
 
 }

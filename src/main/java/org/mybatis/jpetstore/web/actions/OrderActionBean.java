@@ -27,6 +27,7 @@ import net.sourceforge.stripes.integration.spring.SpringBean;
 import org.mybatis.jpetstore.account.api.CustomerProfile;
 import org.mybatis.jpetstore.cart.api.CartSnapshot;
 import org.mybatis.jpetstore.domain.Order;
+import org.mybatis.jpetstore.order.application.OrderFactory;
 import org.mybatis.jpetstore.service.OrderService;
 import org.mybatis.jpetstore.shared.web.SessionState;
 
@@ -50,6 +51,8 @@ public class OrderActionBean extends AbstractActionBean {
 
   @SpringBean
   private transient OrderService orderService;
+  @SpringBean
+  private transient OrderFactory orderFactory;
 
   private Order order = new Order();
   private boolean shippingAddressRequired;
@@ -125,7 +128,7 @@ public class OrderActionBean extends AbstractActionBean {
       setMessage("You must sign on before attempting to check out.  Please sign on and try checking out again.");
       return new ForwardResolution(AccountActionBean.class);
     } else if (cart != null) {
-      order.initOrder(customer, cart);
+      order = orderFactory.createOrder(customer, cart);
       return new ForwardResolution(NEW_ORDER);
     } else {
       setMessage("An order could not be created because a cart could not be found.");
