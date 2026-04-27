@@ -27,6 +27,7 @@ import net.sourceforge.stripes.integration.spring.SpringBean;
 import org.mybatis.jpetstore.domain.Cart;
 import org.mybatis.jpetstore.domain.CartItem;
 import org.mybatis.jpetstore.domain.Item;
+import org.mybatis.jpetstore.inventory.api.InventoryQueryService;
 import org.mybatis.jpetstore.service.CatalogService;
 
 /**
@@ -44,6 +45,8 @@ public class CartActionBean extends AbstractActionBean {
 
   @SpringBean
   private transient CatalogService catalogService;
+  @SpringBean
+  private transient InventoryQueryService inventoryQueryService;
 
   private Cart cart = new Cart();
   private String workingItemId;
@@ -78,7 +81,7 @@ public class CartActionBean extends AbstractActionBean {
       // isInStock is a "real-time" property that must be updated
       // every time an item is added to the cart, even if other
       // item details are cached.
-      boolean isInStock = catalogService.isItemInStock(workingItemId);
+      boolean isInStock = inventoryQueryService.isInStock(workingItemId);
       Item item = catalogService.getItem(workingItemId);
       cart.addItem(item, isInStock);
     }

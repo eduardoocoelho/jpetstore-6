@@ -34,6 +34,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mybatis.jpetstore.domain.Cart;
 import org.mybatis.jpetstore.domain.Item;
+import org.mybatis.jpetstore.inventory.api.InventoryQueryService;
 import org.mybatis.jpetstore.service.CatalogService;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -100,11 +101,13 @@ class CartActionBeanTest {
   }
 
   @Test
-  void addItemToCartWhenItemIsAbsentLoadsItemAndStockFromCatalogService() {
+  void addItemToCartWhenItemIsAbsentLoadsItemFromCatalogAndStockFromInventory() {
     CatalogService catalogService = mock(CatalogService.class);
+    InventoryQueryService inventoryQueryService = mock(InventoryQueryService.class);
     Item item = item("EST-1", "16.50");
     ReflectionTestUtils.setField(cartActionBean, "catalogService", catalogService);
-    when(catalogService.isItemInStock("EST-1")).thenReturn(true);
+    ReflectionTestUtils.setField(cartActionBean, "inventoryQueryService", inventoryQueryService);
+    when(inventoryQueryService.isInStock("EST-1")).thenReturn(true);
     when(catalogService.getItem("EST-1")).thenReturn(item);
     cartActionBean.setWorkingItemId("EST-1");
 
@@ -120,16 +123,18 @@ class CartActionBeanTest {
   @Test
   void addItemToCartWhenItemIsAlreadyPresentOnlyIncrementsQuantity() {
     CatalogService catalogService = mock(CatalogService.class);
+    InventoryQueryService inventoryQueryService = mock(InventoryQueryService.class);
     Item item = item("EST-1", "16.50");
     cartActionBean.getCart().addItem(item, true);
     ReflectionTestUtils.setField(cartActionBean, "catalogService", catalogService);
+    ReflectionTestUtils.setField(cartActionBean, "inventoryQueryService", inventoryQueryService);
     cartActionBean.setWorkingItemId("EST-1");
 
     Resolution resolution = cartActionBean.addItemToCart();
 
     assertThat(resolution.toString()).contains("Cart.jsp");
     assertThat(cartActionBean.getCart().getCartItemList().get(0).getQuantity()).isEqualTo(2);
-    verify(catalogService, never()).isItemInStock("EST-1");
+    verify(inventoryQueryService, never()).isInStock("EST-1");
     verify(catalogService, never()).getItem("EST-1");
   }
 
