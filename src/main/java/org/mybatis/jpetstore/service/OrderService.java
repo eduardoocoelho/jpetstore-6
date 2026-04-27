@@ -1,5 +1,5 @@
 /*
- *    Copyright 2010-2022 the original author or authors.
+ *    Copyright 2010-2026 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -22,10 +22,12 @@ import java.util.Map;
 import org.mybatis.jpetstore.domain.Item;
 import org.mybatis.jpetstore.domain.Order;
 import org.mybatis.jpetstore.domain.Sequence;
+import org.mybatis.jpetstore.inventory.api.InventoryReservationService;
 import org.mybatis.jpetstore.mapper.ItemMapper;
 import org.mybatis.jpetstore.mapper.LineItemMapper;
 import org.mybatis.jpetstore.mapper.OrderMapper;
 import org.mybatis.jpetstore.mapper.SequenceMapper;
+import org.mybatis.jpetstore.order.api.OrderQueryService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Eduardo Macarron
  */
 @Service
-public class OrderService {
+public class OrderService implements OrderQueryService, InventoryReservationService {
 
   private final ItemMapper itemMapper;
   private final OrderMapper orderMapper;
@@ -60,12 +62,7 @@ public class OrderService {
   public void insertOrder(Order order) {
     order.setOrderId(getNextId("ordernum"));
     order.getLineItems().forEach(lineItem -> {
-      String itemId = lineItem.getItemId();
-      Integer increment = lineItem.getQuantity();
-      Map<String, Object> param = new HashMap<>(2);
-      param.put("itemId", itemId);
-      param.put("increment", increment);
-      itemMapper.updateInventoryQuantity(param);
+      decrement(lineItem.getItemId(), lineItem.getQuantity());
     });
 
     orderMapper.insertOrder(order);
@@ -76,6 +73,14 @@ public class OrderService {
     });
   }
 
+  @Override
+  public void decrement(String itemId, int quantity) {
+    Map<String, Object> param = new HashMap<>(2);
+    param.put("itemId", itemId);
+    param.put("increment", quantity);
+    itemMapper.updateInventoryQuantity(param);
+  }
+
   /**
    * Gets the order.
    *
@@ -84,6 +89,7 @@ public class OrderService {
    *
    * @return the order
    */
+  @Override
   @Transactional
   public Order getOrder(int orderId) {
     Order order = orderMapper.getOrder(orderId);
@@ -106,6 +112,7 @@ public class OrderService {
    *
    * @return the orders by username
    */
+  @Override
   public List<Order> getOrdersByUsername(String username) {
     return orderMapper.getOrdersByUsername(username);
   }

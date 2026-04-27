@@ -1,5 +1,5 @@
 /*
- *    Copyright 2010-2022 the original author or authors.
+ *    Copyright 2010-2026 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mybatis.jpetstore.account.api.AccountQueryService;
+import org.mybatis.jpetstore.account.api.CustomerProfile;
 import org.mybatis.jpetstore.domain.Account;
 import org.mybatis.jpetstore.mapper.AccountMapper;
 
@@ -39,6 +41,11 @@ class AccountServiceTest {
 
   @InjectMocks
   private AccountService accountService;
+
+  @Test
+  void shouldImplementAccountQueryServiceApi() {
+    assertThat(accountService).isInstanceOf(AccountQueryService.class);
+  }
 
   @Test
   void shouldCallTheMapperToInsertAnAccount() {
@@ -96,6 +103,45 @@ class AccountServiceTest {
 
     // then
     assertThat(account).isSameAs(expectedAccount);
+  }
+
+  @Test
+  void shouldMapAccountToCustomerProfile() {
+    // given
+    Account account = new Account();
+    account.setUsername("j2ee");
+    account.setEmail("j2ee@example.com");
+    account.setFirstName("Jane");
+    account.setLastName("Doe");
+    account.setAddress1("1 Main Street");
+    account.setAddress2("Apt 2");
+    account.setCity("Denver");
+    account.setState("CO");
+    account.setZip("80202");
+    account.setCountry("USA");
+    account.setPhone("555-0100");
+    account.setFavouriteCategoryId("DOGS");
+    account.setLanguagePreference("english");
+    account.setPassword("secret");
+    when(accountMapper.getAccountByUsername("j2ee")).thenReturn(account);
+
+    // when
+    CustomerProfile customerProfile = accountService.getCustomerProfile("j2ee");
+
+    // then
+    assertThat(customerProfile.username()).isEqualTo("j2ee");
+    assertThat(customerProfile.email()).isEqualTo("j2ee@example.com");
+    assertThat(customerProfile.firstName()).isEqualTo("Jane");
+    assertThat(customerProfile.lastName()).isEqualTo("Doe");
+    assertThat(customerProfile.address1()).isEqualTo("1 Main Street");
+    assertThat(customerProfile.address2()).isEqualTo("Apt 2");
+    assertThat(customerProfile.city()).isEqualTo("Denver");
+    assertThat(customerProfile.state()).isEqualTo("CO");
+    assertThat(customerProfile.zip()).isEqualTo("80202");
+    assertThat(customerProfile.country()).isEqualTo("USA");
+    assertThat(customerProfile.phone()).isEqualTo("555-0100");
+    assertThat(customerProfile.favouriteCategoryId()).isEqualTo("DOGS");
+    assertThat(customerProfile.languagePreference()).isEqualTo("english");
   }
 
 }
