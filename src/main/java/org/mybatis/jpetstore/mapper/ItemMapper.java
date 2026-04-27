@@ -1,5 +1,5 @@
 /*
- *    Copyright 2010-2022 the original author or authors.
+ *    Copyright 2010-2026 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 package org.mybatis.jpetstore.mapper;
 
 import java.util.List;
-import java.util.Map;
 
 import org.mybatis.jpetstore.domain.Item;
 
@@ -26,10 +25,6 @@ import org.mybatis.jpetstore.domain.Item;
  * @author Eduardo Macarron
  */
 public interface ItemMapper {
-
-  void updateInventoryQuantity(Map<String, Object> param);
-
-  int getInventoryQuantity(String itemId);
 
   List<Item> getItemListByProduct(String productId);
 

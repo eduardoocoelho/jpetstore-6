@@ -50,13 +50,15 @@ class CatalogServiceTest {
   private CategoryMapper categoryMapper;
   @Mock
   private ItemMapper itemMapper;
+  @Mock
+  private InventoryQueryService inventoryQueryService;
 
   @InjectMocks
   private CatalogService catalogService;
 
   @Test
-  void shouldImplementCatalogAndInventoryQueryServiceApis() {
-    assertThat(catalogService).isInstanceOf(CatalogQueryService.class).isInstanceOf(InventoryQueryService.class);
+  void shouldImplementCatalogQueryServiceApi() {
+    assertThat(catalogService).isInstanceOf(CatalogQueryService.class);
   }
 
   @Test
@@ -182,6 +184,25 @@ class CatalogServiceTest {
   }
 
   @Test
+  void shouldExposeProductsByCategoryAsProductSummaries() {
+    // given
+    String categoryId = "C01";
+    Product product = new Product();
+    product.setProductId("P01");
+    product.setCategoryId(categoryId);
+    product.setName("Angelfish");
+    product.setDescription("Fresh Water fish from China");
+
+    // when
+    when(productMapper.getProductListByCategory(categoryId)).thenReturn(List.of(product));
+    List<ProductSummary> products = catalogService.getProductsByCategory(categoryId);
+
+    // then
+    assertThat(products)
+        .containsExactly(new ProductSummary("P01", categoryId, "Angelfish", "Fresh Water fish from China"));
+  }
+
+  @Test
   void shouldReturnItemList() {
     // given
     String productId = "P01";
@@ -251,7 +272,7 @@ class CatalogServiceTest {
     String itemCode = "I01";
 
     // when
-    when(itemMapper.getInventoryQuantity(itemCode)).thenReturn(1);
+    when(inventoryQueryService.isInStock(itemCode)).thenReturn(true);
     boolean result = catalogService.isItemInStock(itemCode);
 
     // then
@@ -266,7 +287,7 @@ class CatalogServiceTest {
     String itemCode = "I01";
 
     // when
-    when(itemMapper.getInventoryQuantity(itemCode)).thenReturn(0);
+    when(inventoryQueryService.isInStock(itemCode)).thenReturn(false);
     boolean result = catalogService.isItemInStock(itemCode);
 
     // then
@@ -280,7 +301,7 @@ class CatalogServiceTest {
     String itemCode = "I01";
 
     // when
-    when(itemMapper.getInventoryQuantity(itemCode)).thenReturn(3);
+    when(inventoryQueryService.getInventoryStatus(itemCode)).thenReturn(new InventoryStatus(itemCode, 3, true));
     InventoryStatus inventoryStatus = catalogService.getInventoryStatus(itemCode);
 
     // then

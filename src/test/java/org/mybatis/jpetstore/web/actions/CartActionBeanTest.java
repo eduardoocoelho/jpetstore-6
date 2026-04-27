@@ -16,8 +16,9 @@
 package org.mybatis.jpetstore.web.actions;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -32,20 +33,23 @@ import net.sourceforge.stripes.action.Resolution;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mybatis.jpetstore.cart.application.CartService;
 import org.mybatis.jpetstore.domain.Cart;
 import org.mybatis.jpetstore.domain.Item;
-import org.mybatis.jpetstore.service.CatalogService;
 import org.springframework.test.util.ReflectionTestUtils;
 
 class CartActionBeanTest {
 
   private CartActionBean cartActionBean;
   private ActionBeanContext mockContext;
+  private CartService cartService;
 
   @BeforeEach
   void setUp() {
     cartActionBean = new CartActionBean();
     cartActionBean.setCart(new Cart());
+    cartService = mock(CartService.class);
+    ReflectionTestUtils.setField(cartActionBean, "cartService", cartService);
 
     // Mock ActionBeanContext to avoid NPE in setMessage()
     mockContext = mock(ActionBeanContext.class);
@@ -100,37 +104,25 @@ class CartActionBeanTest {
   }
 
   @Test
-  void addItemToCartWhenItemIsAbsentLoadsItemAndStockFromCatalogService() {
-    CatalogService catalogService = mock(CatalogService.class);
-    Item item = item("EST-1", "16.50");
-    ReflectionTestUtils.setField(cartActionBean, "catalogService", catalogService);
-    when(catalogService.isItemInStock("EST-1")).thenReturn(true);
-    when(catalogService.getItem("EST-1")).thenReturn(item);
+  void addItemToCartWhenWorkingItemIdIsValidDelegatesToCartService() {
     cartActionBean.setWorkingItemId("EST-1");
 
     Resolution resolution = cartActionBean.addItemToCart();
 
     assertThat(resolution.toString()).contains("Cart.jsp");
-    assertThat(cartActionBean.getCart().getNumberOfItems()).isEqualTo(1);
-    assertThat(cartActionBean.getCart().getCartItemList().get(0).getItem()).isSameAs(item);
-    assertThat(cartActionBean.getCart().getCartItemList().get(0).isInStock()).isTrue();
-    assertThat(cartActionBean.getCart().getCartItemList().get(0).getQuantity()).isEqualTo(1);
+    verify(cartService).addItem(same(cartActionBean.getCart()), eq("EST-1"));
   }
 
   @Test
-  void addItemToCartWhenItemIsAlreadyPresentOnlyIncrementsQuantity() {
-    CatalogService catalogService = mock(CatalogService.class);
+  void addItemToCartWhenItemIsAlreadyPresentStillDelegatesToCartService() {
     Item item = item("EST-1", "16.50");
     cartActionBean.getCart().addItem(item, true);
-    ReflectionTestUtils.setField(cartActionBean, "catalogService", catalogService);
     cartActionBean.setWorkingItemId("EST-1");
 
     Resolution resolution = cartActionBean.addItemToCart();
 
     assertThat(resolution.toString()).contains("Cart.jsp");
-    assertThat(cartActionBean.getCart().getCartItemList().get(0).getQuantity()).isEqualTo(2);
-    verify(catalogService, never()).isItemInStock("EST-1");
-    verify(catalogService, never()).getItem("EST-1");
+    verify(cartService).addItem(same(cartActionBean.getCart()), eq("EST-1"));
   }
 
   @Test

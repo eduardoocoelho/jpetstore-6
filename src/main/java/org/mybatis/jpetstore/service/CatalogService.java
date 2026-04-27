@@ -37,15 +37,18 @@ import org.springframework.stereotype.Service;
  * @author Eduardo Macarron
  */
 @Service
-public class CatalogService implements CatalogQueryService, InventoryQueryService {
+public class CatalogService implements CatalogQueryService {
 
   private final CategoryMapper categoryMapper;
   private final ItemMapper itemMapper;
+  private final InventoryQueryService inventoryQueryService;
   private final ProductMapper productMapper;
 
-  public CatalogService(CategoryMapper categoryMapper, ItemMapper itemMapper, ProductMapper productMapper) {
+  public CatalogService(CategoryMapper categoryMapper, ItemMapper itemMapper,
+      InventoryQueryService inventoryQueryService, ProductMapper productMapper) {
     this.categoryMapper = categoryMapper;
     this.itemMapper = itemMapper;
+    this.inventoryQueryService = inventoryQueryService;
     this.productMapper = productMapper;
   }
 
@@ -75,8 +78,13 @@ public class CatalogService implements CatalogQueryService, InventoryQueryServic
   }
 
   @Override
-  public List<ProductSummary> getProductSummariesByCategory(String categoryId) {
+  public List<ProductSummary> getProductsByCategory(String categoryId) {
     return getProductListByCategory(categoryId).stream().map(CatalogService::toProductSummary).toList();
+  }
+
+  @Override
+  public List<ProductSummary> getProductSummariesByCategory(String categoryId) {
+    return getProductsByCategory(categoryId);
   }
 
   /**
@@ -111,15 +119,12 @@ public class CatalogService implements CatalogQueryService, InventoryQueryServic
     return toItemSnapshot(getItem(itemId));
   }
 
-  @Override
   public boolean isItemInStock(String itemId) {
-    return itemMapper.getInventoryQuantity(itemId) > 0;
+    return inventoryQueryService.isInStock(itemId);
   }
 
-  @Override
   public InventoryStatus getInventoryStatus(String itemId) {
-    int quantity = itemMapper.getInventoryQuantity(itemId);
-    return new InventoryStatus(itemId, quantity, quantity > 0);
+    return inventoryQueryService.getInventoryStatus(itemId);
   }
 
   private static ProductSummary toProductSummary(Product product) {

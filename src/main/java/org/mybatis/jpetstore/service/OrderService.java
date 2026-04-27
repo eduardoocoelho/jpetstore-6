@@ -15,15 +15,17 @@
  */
 package org.mybatis.jpetstore.service;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import org.mybatis.jpetstore.catalog.api.CatalogQueryService;
+import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
+import org.mybatis.jpetstore.catalog.api.ProductSummary;
 import org.mybatis.jpetstore.domain.Item;
 import org.mybatis.jpetstore.domain.Order;
+import org.mybatis.jpetstore.domain.Product;
 import org.mybatis.jpetstore.domain.Sequence;
+import org.mybatis.jpetstore.inventory.api.InventoryQueryService;
 import org.mybatis.jpetstore.inventory.api.InventoryReservationService;
-import org.mybatis.jpetstore.mapper.ItemMapper;
 import org.mybatis.jpetstore.mapper.LineItemMapper;
 import org.mybatis.jpetstore.mapper.OrderMapper;
 import org.mybatis.jpetstore.mapper.SequenceMapper;
@@ -37,16 +39,21 @@ import org.springframework.transaction.annotation.Transactional;
  * @author Eduardo Macarron
  */
 @Service
-public class OrderService implements OrderQueryService, InventoryReservationService {
+public class OrderService implements OrderQueryService {
 
-  private final ItemMapper itemMapper;
+  private final CatalogQueryService catalogQueryService;
+  private final InventoryQueryService inventoryQueryService;
+  private final InventoryReservationService inventoryReservationService;
   private final OrderMapper orderMapper;
   private final SequenceMapper sequenceMapper;
   private final LineItemMapper lineItemMapper;
 
-  public OrderService(ItemMapper itemMapper, OrderMapper orderMapper, SequenceMapper sequenceMapper,
+  public OrderService(CatalogQueryService catalogQueryService, InventoryQueryService inventoryQueryService,
+      InventoryReservationService inventoryReservationService, OrderMapper orderMapper, SequenceMapper sequenceMapper,
       LineItemMapper lineItemMapper) {
-    this.itemMapper = itemMapper;
+    this.catalogQueryService = catalogQueryService;
+    this.inventoryQueryService = inventoryQueryService;
+    this.inventoryReservationService = inventoryReservationService;
     this.orderMapper = orderMapper;
     this.sequenceMapper = sequenceMapper;
     this.lineItemMapper = lineItemMapper;
@@ -62,7 +69,7 @@ public class OrderService implements OrderQueryService, InventoryReservationServ
   public void insertOrder(Order order) {
     order.setOrderId(getNextId("ordernum"));
     order.getLineItems().forEach(lineItem -> {
-      decrement(lineItem.getItemId(), lineItem.getQuantity());
+      inventoryReservationService.decrement(lineItem.getItemId(), lineItem.getQuantity());
     });
 
     orderMapper.insertOrder(order);
@@ -71,14 +78,6 @@ public class OrderService implements OrderQueryService, InventoryReservationServ
       lineItem.setOrderId(order.getOrderId());
       lineItemMapper.insertLineItem(lineItem);
     });
-  }
-
-  @Override
-  public void decrement(String itemId, int quantity) {
-    Map<String, Object> param = new HashMap<>(2);
-    param.put("itemId", itemId);
-    param.put("increment", quantity);
-    itemMapper.updateInventoryQuantity(param);
   }
 
   /**
@@ -96,8 +95,8 @@ public class OrderService implements OrderQueryService, InventoryReservationServ
     order.setLineItems(lineItemMapper.getLineItemsByOrderId(orderId));
 
     order.getLineItems().forEach(lineItem -> {
-      Item item = itemMapper.getItem(lineItem.getItemId());
-      item.setQuantity(itemMapper.getInventoryQuantity(lineItem.getItemId()));
+      Item item = toItem(catalogQueryService.getItemSnapshot(lineItem.getItemId()));
+      item.setQuantity(inventoryQueryService.getQuantity(lineItem.getItemId()));
       lineItem.setItem(item);
     });
 
@@ -134,6 +133,32 @@ public class OrderService implements OrderQueryService, InventoryReservationServ
     Sequence parameterObject = new Sequence(name, sequence.getNextId() + 1);
     sequenceMapper.updateSequence(parameterObject);
     return sequence.getNextId();
+  }
+
+  private static Item toItem(ItemSnapshot itemSnapshot) {
+    Item item = new Item();
+    item.setItemId(itemSnapshot.itemId());
+    item.setProduct(toProduct(itemSnapshot.product()));
+    item.setListPrice(itemSnapshot.listPrice());
+    item.setStatus(itemSnapshot.status());
+    item.setAttribute1(itemSnapshot.attribute1());
+    item.setAttribute2(itemSnapshot.attribute2());
+    item.setAttribute3(itemSnapshot.attribute3());
+    item.setAttribute4(itemSnapshot.attribute4());
+    item.setAttribute5(itemSnapshot.attribute5());
+    return item;
+  }
+
+  private static Product toProduct(ProductSummary productSummary) {
+    if (productSummary == null) {
+      return null;
+    }
+    Product product = new Product();
+    product.setProductId(productSummary.productId());
+    product.setCategoryId(productSummary.categoryId());
+    product.setName(productSummary.name());
+    product.setDescription(productSummary.description());
+    return product;
   }
 
 }

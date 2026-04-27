@@ -13,18 +13,14 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.mybatis.jpetstore.inventory.api;
+package org.mybatis.jpetstore.inventory.persistence;
 
-public interface InventoryQueryService {
+import java.util.Map;
 
-  int getQuantity(String itemId);
+public interface InventoryMapper {
 
-  boolean isInStock(String itemId);
+  int getInventoryQuantity(String itemId);
 
-  default boolean isItemInStock(String itemId) {
-    return isInStock(itemId);
-  }
-
-  InventoryStatus getInventoryStatus(String itemId);
+  void updateInventoryQuantity(Map<String, Object> param);
 
 }
