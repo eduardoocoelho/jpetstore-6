@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.mybatis.jpetstore.web.actions;
+package org.mybatis.jpetstore.cart.web;
 
 import java.util.Iterator;
 
@@ -22,12 +22,14 @@ import javax.servlet.http.HttpServletRequest;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.SessionScope;
+import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.integration.spring.SpringBean;
 
 import org.mybatis.jpetstore.cart.application.CartService;
-import org.mybatis.jpetstore.catalog.domain.Item;
-import org.mybatis.jpetstore.domain.Cart;
-import org.mybatis.jpetstore.domain.CartItem;
+import org.mybatis.jpetstore.cart.domain.Cart;
+import org.mybatis.jpetstore.cart.domain.CartItem;
+import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
+import org.mybatis.jpetstore.web.actions.AbstractActionBean;
 
 /**
  * The Class CartActionBean.
@@ -35,6 +37,7 @@ import org.mybatis.jpetstore.domain.CartItem;
  * @author Eduardo Macarron
  */
 @SessionScope
+@UrlBinding("/actions/Cart.action")
 public class CartActionBean extends AbstractActionBean {
 
   private static final long serialVersionUID = -4038684592582714235L;
@@ -89,7 +92,7 @@ public class CartActionBean extends AbstractActionBean {
       return new ForwardResolution(ERROR);
     }
 
-    Item item = cart.removeItemById(workingItemId);
+    ItemSnapshot item = cart.removeItemById(workingItemId);
 
     if (item == null) {
       setMessage("Attempted to remove null CartItem from Cart.");
@@ -110,7 +113,7 @@ public class CartActionBean extends AbstractActionBean {
     Iterator<CartItem> cartItems = getCart().getAllCartItems();
     while (cartItems.hasNext()) {
       CartItem cartItem = cartItems.next();
-      String itemId = cartItem.getItem().getItemId();
+      String itemId = cartItem.getItem().itemId();
       try {
         int quantity = Integer.parseInt(request.getParameter(itemId));
         getCart().setQuantityByItemId(itemId, quantity);

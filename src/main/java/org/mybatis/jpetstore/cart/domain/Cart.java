@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.mybatis.jpetstore.domain;
+package org.mybatis.jpetstore.cart.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.mybatis.jpetstore.catalog.domain.Item;
+import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
 
 /**
  * The Class Cart.
@@ -66,14 +66,14 @@ public class Cart implements Serializable {
    * @param isInStock
    *          the is in stock
    */
-  public void addItem(Item item, boolean isInStock) {
-    CartItem cartItem = itemMap.get(item.getItemId());
+  public void addItem(ItemSnapshot item, boolean isInStock) {
+    CartItem cartItem = itemMap.get(item.itemId());
     if (cartItem == null) {
       cartItem = new CartItem();
       cartItem.setItem(item);
       cartItem.setQuantity(0);
       cartItem.setInStock(isInStock);
-      itemMap.put(item.getItemId(), cartItem);
+      itemMap.put(item.itemId(), cartItem);
       itemList.add(cartItem);
     }
     cartItem.incrementQuantity();
@@ -87,7 +87,7 @@ public class Cart implements Serializable {
    *
    * @return the item
    */
-  public Item removeItemById(String itemId) {
+  public ItemSnapshot removeItemById(String itemId) {
     CartItem cartItem = itemMap.remove(itemId);
     if (cartItem == null) {
       return null;
@@ -120,7 +120,7 @@ public class Cart implements Serializable {
    */
   public BigDecimal getSubTotal() {
     return itemList.stream()
-        .map(cartItem -> cartItem.getItem().getListPrice().multiply(new BigDecimal(cartItem.getQuantity())))
+        .map(cartItem -> cartItem.getItem().listPrice().multiply(new BigDecimal(cartItem.getQuantity())))
         .reduce(BigDecimal.ZERO, BigDecimal::add);
   }
 

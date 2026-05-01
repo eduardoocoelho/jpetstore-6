@@ -15,9 +15,9 @@
  */
 package org.mybatis.jpetstore.cart.application;
 
+import org.mybatis.jpetstore.cart.domain.Cart;
 import org.mybatis.jpetstore.catalog.api.CatalogQueryService;
-import org.mybatis.jpetstore.catalog.domain.Item;
-import org.mybatis.jpetstore.domain.Cart;
+import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
 import org.mybatis.jpetstore.inventory.api.InventoryQueryService;
 import org.springframework.stereotype.Service;
 
@@ -37,7 +37,7 @@ public class CartService {
       cart.incrementQuantityByItemId(itemId);
     } else {
       boolean isInStock = inventoryQueryService.isInStock(itemId);
-      Item item = catalogQueryService.getItem(itemId);
+      ItemSnapshot item = catalogQueryService.getItemSnapshot(itemId);
       cart.addItem(item, isInStock);
     }
   }

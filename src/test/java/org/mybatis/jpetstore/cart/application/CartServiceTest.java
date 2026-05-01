@@ -24,9 +24,9 @@ import static org.mockito.Mockito.when;
 import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Test;
+import org.mybatis.jpetstore.cart.domain.Cart;
 import org.mybatis.jpetstore.catalog.api.CatalogQueryService;
-import org.mybatis.jpetstore.catalog.domain.Item;
-import org.mybatis.jpetstore.domain.Cart;
+import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
 import org.mybatis.jpetstore.inventory.api.InventoryQueryService;
 
 class CartServiceTest {
@@ -39,9 +39,9 @@ class CartServiceTest {
   void shouldLoadItemAndStockWhenItemIsAbsent() {
     // given
     Cart cart = new Cart();
-    Item item = item("EST-1");
+    ItemSnapshot item = item("EST-1");
     when(inventoryQueryService.isInStock("EST-1")).thenReturn(true);
-    when(catalogQueryService.getItem("EST-1")).thenReturn(item);
+    when(catalogQueryService.getItemSnapshot("EST-1")).thenReturn(item);
 
     // when
     cartService.addItem(cart, "EST-1");
@@ -66,14 +66,11 @@ class CartServiceTest {
     assertThat(cart.getNumberOfItems()).isEqualTo(1);
     assertThat(cart.getCartItemList().get(0).getQuantity()).isEqualTo(2);
     verify(inventoryQueryService, never()).isInStock("EST-1");
-    verify(catalogQueryService, never()).getItem("EST-1");
+    verify(catalogQueryService, never()).getItemSnapshot("EST-1");
   }
 
-  private static Item item(String itemId) {
-    Item item = new Item();
-    item.setItemId(itemId);
-    item.setListPrice(new BigDecimal("16.50"));
-    return item;
+  private static ItemSnapshot item(String itemId) {
+    return new ItemSnapshot(itemId, null, null, new BigDecimal("16.50"), null, null, null, null, null, null);
   }
 
 }

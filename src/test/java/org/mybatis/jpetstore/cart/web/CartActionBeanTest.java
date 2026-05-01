@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.mybatis.jpetstore.web.actions;
+package org.mybatis.jpetstore.cart.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -34,8 +34,8 @@ import net.sourceforge.stripes.action.Resolution;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mybatis.jpetstore.cart.application.CartService;
-import org.mybatis.jpetstore.catalog.domain.Item;
-import org.mybatis.jpetstore.domain.Cart;
+import org.mybatis.jpetstore.cart.domain.Cart;
+import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
 import org.springframework.test.util.ReflectionTestUtils;
 
 class CartActionBeanTest {
@@ -115,7 +115,7 @@ class CartActionBeanTest {
 
   @Test
   void addItemToCartWhenItemIsAlreadyPresentStillDelegatesToCartService() {
-    Item item = item("EST-1", "16.50");
+    ItemSnapshot item = item("EST-1", "16.50");
     cartActionBean.getCart().addItem(item, true);
     cartActionBean.setWorkingItemId("EST-1");
 
@@ -167,7 +167,7 @@ class CartActionBeanTest {
 
   @Test
   void removeItemFromCartWhenItemExistsRemovesItAndReturnsCartView() {
-    Item item = item("EST-1", "16.50");
+    ItemSnapshot item = item("EST-1", "16.50");
     cartActionBean.getCart().addItem(item, true);
     cartActionBean.setWorkingItemId("EST-1");
 
@@ -181,8 +181,8 @@ class CartActionBeanTest {
   @Test
   void updateCartQuantitiesAppliesNumericValuesAndRemovesItemsBelowOneFromVisibleList() {
     HttpServletRequest request = mock(HttpServletRequest.class);
-    Item keptItem = item("EST-1", "16.50");
-    Item removedItem = item("EST-2", "12.00");
+    ItemSnapshot keptItem = item("EST-1", "16.50");
+    ItemSnapshot removedItem = item("EST-2", "12.00");
     cartActionBean.getCart().addItem(keptItem, true);
     cartActionBean.getCart().addItem(removedItem, true);
     when(mockContext.getRequest()).thenReturn(request);
@@ -195,7 +195,7 @@ class CartActionBeanTest {
     assertThat(cartActionBean.getCart().containsItemId("EST-1")).isTrue();
     assertThat(cartActionBean.getCart().containsItemId("EST-2")).isTrue();
     assertThat(cartActionBean.getCart().getNumberOfItems()).isEqualTo(1);
-    assertThat(cartActionBean.getCart().getCartItemList()).extracting(cartItem -> cartItem.getItem().getItemId())
+    assertThat(cartActionBean.getCart().getCartItemList()).extracting(cartItem -> cartItem.getItem().itemId())
         .containsExactly("EST-1");
     assertThat(cartActionBean.getCart().getCartItemList().get(0).getQuantity()).isEqualTo(3);
   }
@@ -210,10 +210,7 @@ class CartActionBeanTest {
     assertThat(cartActionBean.getCart().getNumberOfItems()).isZero();
   }
 
-  private static Item item(String itemId, String price) {
-    Item item = new Item();
-    item.setItemId(itemId);
-    item.setListPrice(new BigDecimal(price));
-    return item;
+  private static ItemSnapshot item(String itemId, String price) {
+    return new ItemSnapshot(itemId, null, null, new BigDecimal(price), null, null, null, null, null, null);
   }
 }

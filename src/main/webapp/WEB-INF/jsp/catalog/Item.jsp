@@ -56,7 +56,7 @@
 
 	<tr>
 		<td><stripes:link class="Button"
-			beanclass="org.mybatis.jpetstore.web.actions.CartActionBean"
+			beanclass="org.mybatis.jpetstore.cart.web.CartActionBean"
 			event="addItemToCart">
 			<stripes:param name="workingItemId" value="${actionBean.item.itemId}" />
        	Add to Cart
@@ -67,6 +67,5 @@
 </div>
 
 <%@ include file="../common/IncludeBottom.jsp"%>
-
 
 

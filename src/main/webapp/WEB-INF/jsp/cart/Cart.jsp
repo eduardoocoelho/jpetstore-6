@@ -27,7 +27,7 @@
 
 <h2>Shopping Cart</h2>
 <stripes:form
-	beanclass="org.mybatis.jpetstore.web.actions.CartActionBean">
+	beanclass="org.mybatis.jpetstore.cart.web.CartActionBean">
 	<table>
 		<tr>
 			<th><b>Item ID</b></th>
@@ -66,7 +66,7 @@
 				<td>$<fmt:formatNumber value="${cartItem.total}"
 					pattern="#,##0.00" /></td>
 				<td><stripes:link class="Button"
-					beanclass="org.mybatis.jpetstore.web.actions.CartActionBean"
+					beanclass="org.mybatis.jpetstore.cart.web.CartActionBean"
 					event="removeItemFromCart">
 					<stripes:param name="workingItemId" value="${cartItem.item.itemId}" />
             	Remove

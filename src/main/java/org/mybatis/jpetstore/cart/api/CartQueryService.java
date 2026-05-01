@@ -20,12 +20,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
-import org.mybatis.jpetstore.catalog.api.ProductSummary;
-import org.mybatis.jpetstore.catalog.domain.Item;
-import org.mybatis.jpetstore.catalog.domain.Product;
-import org.mybatis.jpetstore.domain.Cart;
-import org.mybatis.jpetstore.domain.CartItem;
+import org.mybatis.jpetstore.cart.domain.Cart;
+import org.mybatis.jpetstore.cart.domain.CartItem;
 
 public interface CartQueryService {
 
@@ -46,20 +42,7 @@ public interface CartQueryService {
   }
 
   private static CartLineSnapshot toCartLineSnapshot(CartItem cartItem) {
-    return new CartLineSnapshot(toItemSnapshot(cartItem.getItem()), cartItem.getQuantity(), cartItem.isInStock(),
-        cartItem.getTotal());
-  }
-
-  private static ItemSnapshot toItemSnapshot(Item item) {
-    Product product = item.getProduct();
-    ProductSummary productSummary = null;
-    if (product != null) {
-      productSummary = new ProductSummary(product.getProductId(), product.getCategoryId(), product.getName(),
-          product.getDescription());
-    }
-    return new ItemSnapshot(item.getItemId(), product == null ? null : product.getProductId(), productSummary,
-        item.getListPrice(), item.getStatus(), item.getAttribute1(), item.getAttribute2(), item.getAttribute3(),
-        item.getAttribute4(), item.getAttribute5());
+    return new CartLineSnapshot(cartItem.getItem(), cartItem.getQuantity(), cartItem.isInStock(), cartItem.getTotal());
   }
 
 }

@@ -55,7 +55,7 @@
 
 <div id="Menu">
 <div id="MenuContent"><stripes:link
-	beanclass="org.mybatis.jpetstore.web.actions.CartActionBean"
+	beanclass="org.mybatis.jpetstore.cart.web.CartActionBean"
 	event="viewCart">
 	<img align="middle" name="img_cart" src="../images/cart.gif" />
 </stripes:link> <img align="middle" src="../images/separator.gif" /> <c:if

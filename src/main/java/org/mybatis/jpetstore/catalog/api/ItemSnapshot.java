@@ -19,4 +19,44 @@ import java.math.BigDecimal;
 
 public record ItemSnapshot(String itemId, String productId, ProductSummary product, BigDecimal listPrice, String status,
     String attribute1, String attribute2, String attribute3, String attribute4, String attribute5) {
+
+  public String getItemId() {
+    return itemId;
+  }
+
+  public String getProductId() {
+    return productId;
+  }
+
+  public ProductSummary getProduct() {
+    return product;
+  }
+
+  public BigDecimal getListPrice() {
+    return listPrice;
+  }
+
+  public String getStatus() {
+    return status;
+  }
+
+  public String getAttribute1() {
+    return attribute1;
+  }
+
+  public String getAttribute2() {
+    return attribute2;
+  }
+
+  public String getAttribute3() {
+    return attribute3;
+  }
+
+  public String getAttribute4() {
+    return attribute4;
+  }
+
+  public String getAttribute5() {
+    return attribute5;
+  }
 }

@@ -19,7 +19,11 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Optional;
 
+import org.mybatis.jpetstore.cart.domain.CartItem;
+import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
+import org.mybatis.jpetstore.catalog.api.ProductSummary;
 import org.mybatis.jpetstore.catalog.domain.Item;
+import org.mybatis.jpetstore.catalog.domain.Product;
 
 /**
  * The Class LineItem.
@@ -50,11 +54,12 @@ public class LineItem implements Serializable {
    *          the cart item
    */
   public LineItem(int lineNumber, CartItem cartItem) {
+    ItemSnapshot cartItemSnapshot = cartItem.getItem();
     this.lineNumber = lineNumber;
     this.quantity = cartItem.getQuantity();
-    this.itemId = cartItem.getItem().getItemId();
-    this.unitPrice = cartItem.getItem().getListPrice();
-    this.item = cartItem.getItem();
+    this.itemId = cartItemSnapshot.itemId();
+    this.unitPrice = cartItemSnapshot.listPrice();
+    this.item = toItem(cartItemSnapshot);
     calculateTotal();
   }
 
@@ -115,6 +120,32 @@ public class LineItem implements Serializable {
   private void calculateTotal() {
     total = Optional.ofNullable(item).map(Item::getListPrice).map(v -> v.multiply(new BigDecimal(quantity)))
         .orElse(null);
+  }
+
+  private static Item toItem(ItemSnapshot itemSnapshot) {
+    Item item = new Item();
+    item.setItemId(itemSnapshot.itemId());
+    item.setProduct(toProduct(itemSnapshot.product()));
+    item.setListPrice(itemSnapshot.listPrice());
+    item.setStatus(itemSnapshot.status());
+    item.setAttribute1(itemSnapshot.attribute1());
+    item.setAttribute2(itemSnapshot.attribute2());
+    item.setAttribute3(itemSnapshot.attribute3());
+    item.setAttribute4(itemSnapshot.attribute4());
+    item.setAttribute5(itemSnapshot.attribute5());
+    return item;
+  }
+
+  private static Product toProduct(ProductSummary productSummary) {
+    if (productSummary == null) {
+      return null;
+    }
+    Product product = new Product();
+    product.setProductId(productSummary.productId());
+    product.setCategoryId(productSummary.categoryId());
+    product.setName(productSummary.name());
+    product.setDescription(productSummary.description());
+    return product;
   }
 
 }

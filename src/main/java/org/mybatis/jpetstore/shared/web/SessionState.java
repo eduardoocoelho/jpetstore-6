@@ -23,11 +23,11 @@ import javax.servlet.http.HttpSession;
 import org.mybatis.jpetstore.account.api.CustomerProfile;
 import org.mybatis.jpetstore.cart.api.CartQueryService;
 import org.mybatis.jpetstore.cart.api.CartSnapshot;
+import org.mybatis.jpetstore.cart.domain.Cart;
+import org.mybatis.jpetstore.cart.domain.CartItem;
+import org.mybatis.jpetstore.cart.web.CartActionBean;
 import org.mybatis.jpetstore.domain.Account;
-import org.mybatis.jpetstore.domain.Cart;
-import org.mybatis.jpetstore.domain.CartItem;
 import org.mybatis.jpetstore.web.actions.AccountActionBean;
-import org.mybatis.jpetstore.web.actions.CartActionBean;
 
 public class SessionState {
 

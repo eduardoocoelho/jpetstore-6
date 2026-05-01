@@ -18,7 +18,7 @@
 <%@ include file="../common/IncludeTop.jsp"%>
 
 <div id="BackLink"><stripes:link
-	beanclass="org.mybatis.jpetstore.web.actions.CartActionBean">
+	beanclass="org.mybatis.jpetstore.cart.web.CartActionBean">
 	Return to Shopping Cart</stripes:link></div>
 
 <div id="Catalog">

@@ -13,13 +13,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.mybatis.jpetstore.domain;
+package org.mybatis.jpetstore.cart.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Optional;
 
-import org.mybatis.jpetstore.catalog.domain.Item;
+import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
 
 /**
  * The Class CartItem.
@@ -30,7 +30,7 @@ public class CartItem implements Serializable {
 
   private static final long serialVersionUID = 6620528781626504362L;
 
-  private Item item;
+  private ItemSnapshot item;
   private int quantity;
   private boolean inStock;
   private BigDecimal total;
@@ -47,11 +47,11 @@ public class CartItem implements Serializable {
     return total;
   }
 
-  public Item getItem() {
+  public ItemSnapshot getItem() {
     return item;
   }
 
-  public void setItem(Item item) {
+  public void setItem(ItemSnapshot item) {
     this.item = item;
     calculateTotal();
   }
@@ -71,7 +71,7 @@ public class CartItem implements Serializable {
   }
 
   private void calculateTotal() {
-    total = Optional.ofNullable(item).map(Item::getListPrice).map(v -> v.multiply(new BigDecimal(quantity)))
+    total = Optional.ofNullable(item).map(ItemSnapshot::listPrice).map(v -> v.multiply(new BigDecimal(quantity)))
         .orElse(null);
   }
 

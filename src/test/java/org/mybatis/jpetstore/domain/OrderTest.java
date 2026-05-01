@@ -21,7 +21,8 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import org.junit.jupiter.api.Test;
-import org.mybatis.jpetstore.catalog.domain.Item;
+import org.mybatis.jpetstore.cart.domain.Cart;
+import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
 
 class OrderTest {
 
@@ -43,9 +44,7 @@ class OrderTest {
     account.setPhone("09012345678");
 
     Cart cart = new Cart();
-    Item item = new Item();
-    item.setItemId("I01");
-    item.setListPrice(new BigDecimal("2.05"));
+    ItemSnapshot item = new ItemSnapshot("I01", null, null, new BigDecimal("2.05"), null, null, null, null, null, null);
     cart.addItem(item, true);
     cart.addItem(item, true);
 
@@ -77,7 +76,7 @@ class OrderTest {
     assertThat(order.getLocale()).isEqualTo("CA");
     assertThat(order.getStatus()).isEqualTo("P");
     assertThat(order.getLineItems()).hasSize(1);
-    assertThat(order.getLineItems().get(0).getItem()).isSameAs(item);
+    assertThat(order.getLineItems().get(0).getItem().getItemId()).isEqualTo(item.itemId());
     assertThat(order.getLineItems().get(0).getLineNumber()).isEqualTo(1);
     assertThat(order.getLineItems().get(0).getItemId()).isEqualTo("I01");
     assertThat(order.getLineItems().get(0).getUnitPrice()).isEqualTo(new BigDecimal("2.05"));

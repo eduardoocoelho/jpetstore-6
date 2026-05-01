@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.mybatis.jpetstore.domain;
+package org.mybatis.jpetstore.cart.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -21,7 +21,7 @@ import java.math.BigDecimal;
 import java.util.Iterator;
 
 import org.junit.jupiter.api.Test;
-import org.mybatis.jpetstore.catalog.domain.Item;
+import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
 
 class CartTest {
 
@@ -29,9 +29,7 @@ class CartTest {
   void addItemWhenIsInStockIsTrue() {
     // given
     Cart cart = new Cart();
-    Item item = new Item();
-    item.setItemId("I01");
-    item.setListPrice(new BigDecimal("2.05"));
+    ItemSnapshot item = item("I01", "2.05");
 
     // when
     cart.addItem(item, true);
@@ -60,9 +58,7 @@ class CartTest {
   void addItemWhenIsInStockIsFalse() {
     // given
     Cart cart = new Cart();
-    Item item = new Item();
-    item.setItemId("I01");
-    item.setListPrice(new BigDecimal("2.05"));
+    ItemSnapshot item = item("I01", "2.05");
 
     // when
     cart.addItem(item, false);
@@ -80,7 +76,7 @@ class CartTest {
     Cart cart = new Cart();
 
     // when
-    Item item = cart.removeItemById("I01");
+    ItemSnapshot item = cart.removeItemById("I01");
 
     // then
     assertThat(item).isNull();
@@ -94,13 +90,11 @@ class CartTest {
   void removeItemByIdWhenItemFound() {
     // given
     Cart cart = new Cart();
-    Item item = new Item();
-    item.setItemId("I01");
-    item.setListPrice(new BigDecimal("2.05"));
+    ItemSnapshot item = item("I01", "2.05");
     cart.addItem(item, true);
 
     // when
-    Item removedItem = cart.removeItemById("I01");
+    ItemSnapshot removedItem = cart.removeItemById("I01");
 
     // then
     assertThat(removedItem).isSameAs(item);
@@ -111,9 +105,7 @@ class CartTest {
   void incrementQuantityByItemId() {
     // given
     Cart cart = new Cart();
-    Item item = new Item();
-    item.setItemId("I01");
-    item.setListPrice(new BigDecimal("2.05"));
+    ItemSnapshot item = item("I01", "2.05");
     cart.addItem(item, true);
 
     // when
@@ -131,9 +123,7 @@ class CartTest {
   void setQuantityByItemId() {
     // given
     Cart cart = new Cart();
-    Item item = new Item();
-    item.setItemId("I01");
-    item.setListPrice(new BigDecimal("2.05"));
+    ItemSnapshot item = item("I01", "2.05");
     cart.addItem(item, true);
 
     // when
@@ -164,17 +154,11 @@ class CartTest {
     // given
     Cart cart = new Cart();
     {
-      Item item = new Item();
-      item.setItemId("I01");
-      item.setListPrice(new BigDecimal("2.05"));
-      cart.addItem(item, true);
+      cart.addItem(item("I01", "2.05"), true);
       cart.setQuantityByItemId("I01", 5);
     }
     {
-      Item item = new Item();
-      item.setItemId("I02");
-      item.setListPrice(new BigDecimal("3.06"));
-      cart.addItem(item, true);
+      cart.addItem(item("I02", "3.06"), true);
       cart.setQuantityByItemId("I02", 6);
     }
 
@@ -183,6 +167,10 @@ class CartTest {
 
     // then
     assertThat(subTotal).isEqualTo(new BigDecimal("28.61"));
+  }
+
+  private static ItemSnapshot item(String itemId, String price) {
+    return new ItemSnapshot(itemId, null, null, new BigDecimal(price), null, null, null, null, null, null);
   }
 
 }

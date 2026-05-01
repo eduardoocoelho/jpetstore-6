@@ -36,9 +36,10 @@ import net.sourceforge.stripes.controller.ActionResolver;
 import net.sourceforge.stripes.controller.StripesFilter;
 
 import org.junit.jupiter.api.Test;
-import org.mybatis.jpetstore.catalog.domain.Item;
+import org.mybatis.jpetstore.cart.domain.Cart;
+import org.mybatis.jpetstore.cart.web.CartActionBean;
+import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
 import org.mybatis.jpetstore.domain.Account;
-import org.mybatis.jpetstore.domain.Cart;
 import org.mybatis.jpetstore.domain.Order;
 import org.mybatis.jpetstore.order.application.OrderFactory;
 import org.mybatis.jpetstore.service.OrderService;
@@ -248,9 +249,7 @@ class OrderActionBeanTest {
   }
 
   private static CartActionBean cartBeanWithItem(String itemId, String price, int quantity) {
-    Item item = new Item();
-    item.setItemId(itemId);
-    item.setListPrice(new BigDecimal(price));
+    ItemSnapshot item = new ItemSnapshot(itemId, null, null, new BigDecimal(price), null, null, null, null, null, null);
 
     Cart cart = new Cart();
     cart.addItem(item, true);
