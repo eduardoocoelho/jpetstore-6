@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -33,6 +34,8 @@ import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.config.Configuration;
 import net.sourceforge.stripes.controller.ActionResolver;
 import net.sourceforge.stripes.controller.StripesFilter;
+import net.sourceforge.stripes.validation.DefaultValidationMetadataProvider;
+import net.sourceforge.stripes.validation.ValidationMetadata;
 
 import org.junit.jupiter.api.Test;
 import org.mybatis.jpetstore.account.application.AccountService;
@@ -134,6 +137,36 @@ class AccountActionBeanTest {
     assertThat(actual.getZip()).isNull();
     assertThat(actual.getCity()).isNull();
 
+  }
+
+  @Test
+  void validationMetadataKeepsAccountFormFieldsRequiredOnWebBean() {
+    DefaultValidationMetadataProvider provider = new DefaultValidationMetadataProvider();
+
+    Map<String, ValidationMetadata> metadata = provider.getValidationMetadata(AccountActionBean.class);
+
+    assertThat(metadata).containsKeys("username", "password", "account.firstName", "account.lastName");
+    assertThat(metadata.get("username").requiredOn("signon")).isTrue();
+    assertThat(metadata.get("password").requiredOn("signon")).isTrue();
+    assertThat(metadata.get("username").requiredOn("newAccount")).isTrue();
+    assertThat(metadata.get("password").requiredOn("newAccount")).isTrue();
+    assertThat(metadata.get("account.firstName").requiredOn("newAccount")).isTrue();
+    assertThat(metadata.get("account.lastName").requiredOn("newAccount")).isTrue();
+    assertThat(metadata.get("username").requiredOn("editAccount")).isTrue();
+    assertThat(metadata.get("password").requiredOn("editAccount")).isTrue();
+    assertThat(metadata.get("account.firstName").requiredOn("editAccount")).isTrue();
+    assertThat(metadata.get("account.lastName").requiredOn("editAccount")).isTrue();
+    assertThat(metadata.get("account.firstName").requiredOn("signon")).isFalse();
+    assertThat(metadata.get("account.lastName").requiredOn("signon")).isFalse();
+  }
+
+  @Test
+  void accountDomainDoesNotOwnStripesValidationMetadata() {
+    DefaultValidationMetadataProvider provider = new DefaultValidationMetadataProvider();
+
+    Map<String, ValidationMetadata> metadata = provider.getValidationMetadata(Account.class);
+
+    assertThat(metadata).isEmpty();
   }
 
   @Test
