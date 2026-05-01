@@ -17,7 +17,7 @@ package org.mybatis.jpetstore.order.api;
 
 import java.util.List;
 
-import org.mybatis.jpetstore.domain.Order;
+import org.mybatis.jpetstore.order.domain.Order;
 
 public interface OrderQueryService {
 

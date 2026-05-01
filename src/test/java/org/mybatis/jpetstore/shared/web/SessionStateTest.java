@@ -25,13 +25,13 @@ import javax.servlet.http.HttpSession;
 
 import org.junit.jupiter.api.Test;
 import org.mybatis.jpetstore.account.api.CustomerProfile;
+import org.mybatis.jpetstore.account.domain.Account;
+import org.mybatis.jpetstore.account.web.AccountActionBean;
 import org.mybatis.jpetstore.cart.api.CartSnapshot;
-import org.mybatis.jpetstore.domain.Account;
-import org.mybatis.jpetstore.domain.Cart;
-import org.mybatis.jpetstore.domain.Item;
-import org.mybatis.jpetstore.domain.Product;
-import org.mybatis.jpetstore.web.actions.AccountActionBean;
-import org.mybatis.jpetstore.web.actions.CartActionBean;
+import org.mybatis.jpetstore.cart.domain.Cart;
+import org.mybatis.jpetstore.cart.web.CartActionBean;
+import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
+import org.mybatis.jpetstore.catalog.api.ProductSummary;
 import org.springframework.test.util.ReflectionTestUtils;
 
 class SessionStateTest {
@@ -43,7 +43,7 @@ class SessionStateTest {
 
     assertThat(sessionState.isAuthenticated()).isFalse();
     assertThat(sessionState.getCurrentUsername()).isNull();
-    assertThat(sessionState.getCurrentCustomerProfile()).isNull();
+    assertThat(sessionState.getCurrentCustomerProfile(CustomerProfile.class)).isNull();
   }
 
   @Test
@@ -53,7 +53,7 @@ class SessionStateTest {
     when(session.getAttribute(SessionState.ACCOUNT_ACTION_SESSION_KEY)).thenReturn(accountBean);
     SessionState sessionState = new SessionState(session);
 
-    CustomerProfile customerProfile = sessionState.getCurrentCustomerProfile();
+    CustomerProfile customerProfile = sessionState.getCurrentCustomerProfile(CustomerProfile.class);
 
     assertThat(sessionState.isAuthenticated()).isTrue();
     assertThat(sessionState.getCurrentUsername()).isEqualTo("j2ee");
@@ -91,7 +91,7 @@ class SessionStateTest {
     when(session.getAttribute(SessionState.CART_ACTION_SESSION_KEY)).thenReturn(cartBean);
     SessionState sessionState = new SessionState(session);
 
-    CartSnapshot cartSnapshot = sessionState.getCurrentCartSnapshot();
+    CartSnapshot cartSnapshot = sessionState.getCurrentCartSnapshot(CartSnapshot.class);
 
     assertThat(cartSnapshot.numberOfItems()).isEqualTo(1);
     assertThat(cartSnapshot.subTotal()).isEqualTo(new BigDecimal("33.00"));
@@ -107,7 +107,7 @@ class SessionStateTest {
     HttpSession session = mock(HttpSession.class);
     SessionState sessionState = new SessionState(session);
 
-    assertThat(sessionState.getCurrentCartSnapshot()).isNull();
+    assertThat(sessionState.getCurrentCartSnapshot(CartSnapshot.class)).isNull();
   }
 
   @Test
@@ -145,16 +145,9 @@ class SessionStateTest {
   }
 
   private static CartActionBean cartActionBeanWithItem() {
-    Product product = new Product();
-    product.setProductId("FI-SW-01");
-    product.setCategoryId("FISH");
-    product.setName("Angelfish");
-    product.setDescription("Fresh Water fish from China");
-
-    Item item = new Item();
-    item.setItemId("EST-1");
-    item.setProduct(product);
-    item.setListPrice(new BigDecimal("16.50"));
+    ProductSummary product = new ProductSummary("FI-SW-01", "FISH", "Angelfish", "Fresh Water fish from China");
+    ItemSnapshot item = new ItemSnapshot("EST-1", "FI-SW-01", product, new BigDecimal("16.50"), null, null, null, null,
+        null, null);
 
     Cart cart = new Cart();
     cart.addItem(item, true);

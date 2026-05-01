@@ -15,7 +15,7 @@
  */
 package org.mybatis.jpetstore.account.api;
 
-import org.mybatis.jpetstore.domain.Account;
+import org.mybatis.jpetstore.account.domain.Account;
 
 public interface AccountQueryService {
 

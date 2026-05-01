@@ -17,9 +17,9 @@ package org.mybatis.jpetstore.catalog.api;
 
 import java.util.List;
 
-import org.mybatis.jpetstore.domain.Category;
-import org.mybatis.jpetstore.domain.Item;
-import org.mybatis.jpetstore.domain.Product;
+import org.mybatis.jpetstore.catalog.domain.Category;
+import org.mybatis.jpetstore.catalog.domain.Item;
+import org.mybatis.jpetstore.catalog.domain.Product;
 
 public interface CatalogQueryService {
 

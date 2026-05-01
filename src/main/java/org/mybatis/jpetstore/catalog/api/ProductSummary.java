@@ -16,4 +16,20 @@
 package org.mybatis.jpetstore.catalog.api;
 
 public record ProductSummary(String productId, String categoryId, String name, String description) {
+
+  public String getProductId() {
+    return productId;
+  }
+
+  public String getCategoryId() {
+    return categoryId;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getDescription() {
+    return description;
+  }
 }

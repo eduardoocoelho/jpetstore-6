@@ -21,10 +21,10 @@ import java.math.BigDecimal;
 import java.util.Iterator;
 
 import org.junit.jupiter.api.Test;
-import org.mybatis.jpetstore.domain.Cart;
-import org.mybatis.jpetstore.domain.CartItem;
-import org.mybatis.jpetstore.domain.Item;
-import org.mybatis.jpetstore.domain.Product;
+import org.mybatis.jpetstore.cart.domain.Cart;
+import org.mybatis.jpetstore.cart.domain.CartItem;
+import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
+import org.mybatis.jpetstore.catalog.api.ProductSummary;
 
 class CartQueryServiceTest {
 
@@ -49,18 +49,9 @@ class CartQueryServiceTest {
   @Test
   void shouldMapCartToCartSnapshot() {
     // given
-    Product product = new Product();
-    product.setProductId("FI-SW-01");
-    product.setCategoryId("FISH");
-    product.setName("Angelfish");
-    product.setDescription("Fresh Water fish from China");
-
-    Item item = new Item();
-    item.setItemId("EST-1");
-    item.setProduct(product);
-    item.setListPrice(new BigDecimal("16.50"));
-    item.setStatus("P");
-    item.setAttribute1("Large");
+    ProductSummary product = new ProductSummary("FI-SW-01", "FISH", "Angelfish", "Fresh Water fish from China");
+    ItemSnapshot item = new ItemSnapshot("EST-1", "FI-SW-01", product, new BigDecimal("16.50"), "P", "Large", null,
+        null, null, null);
 
     Cart cart = new Cart();
     cart.addItem(item, true);

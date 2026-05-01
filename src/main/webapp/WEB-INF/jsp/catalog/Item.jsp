@@ -1,6 +1,6 @@
 <%--
 
-       Copyright 2010-2022 the original author or authors.
+       Copyright 2010-2026 the original author or authors.
 
        Licensed under the Apache License, Version 2.0 (the "License");
        you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 <%@ include file="../common/IncludeTop.jsp"%>
 
 <div id="BackLink"><stripes:link
-	beanclass="org.mybatis.jpetstore.web.actions.CatalogActionBean"
+	beanclass="org.mybatis.jpetstore.catalog.web.CatalogActionBean"
 	event="viewProduct">
 	<stripes:param name="productId" value="${actionBean.product.productId}" />
 	Return to ${actionBean.product.productId}
@@ -56,7 +56,7 @@
 
 	<tr>
 		<td><stripes:link class="Button"
-			beanclass="org.mybatis.jpetstore.web.actions.CartActionBean"
+			beanclass="org.mybatis.jpetstore.cart.web.CartActionBean"
 			event="addItemToCart">
 			<stripes:param name="workingItemId" value="${actionBean.item.itemId}" />
        	Add to Cart
@@ -67,6 +67,5 @@
 </div>
 
 <%@ include file="../common/IncludeBottom.jsp"%>
-
 
 

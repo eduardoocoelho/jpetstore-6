@@ -1,6 +1,6 @@
 <%--
 
-       Copyright 2010-2022 the original author or authors.
+       Copyright 2010-2026 the original author or authors.
 
        Licensed under the Apache License, Version 2.0 (the "License");
        you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 <%@ include file="../common/IncludeTop.jsp"%>
 
 <div id="BackLink"><stripes:link
-	beanclass="org.mybatis.jpetstore.web.actions.CatalogActionBean">
+	beanclass="org.mybatis.jpetstore.catalog.web.CatalogActionBean">
 	Return to Main Menu
 	</stripes:link></div>
 
@@ -108,14 +108,13 @@ press continue...
 </table>
 
 <stripes:link class="Button"
-	beanclass="org.mybatis.jpetstore.web.actions.OrderActionBean"
+	beanclass="org.mybatis.jpetstore.order.web.OrderActionBean"
 	event="newOrder">
 	<stripes:param name="confirmed" value="true" />
 Confirm
 </stripes:link></div>
 
 <%@ include file="../common/IncludeBottom.jsp"%>
-
 
 
 

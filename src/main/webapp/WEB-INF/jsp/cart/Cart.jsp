@@ -1,6 +1,6 @@
 <%--
 
-       Copyright 2010-2023 the original author or authors.
+       Copyright 2010-2026 the original author or authors.
 
        Licensed under the Apache License, Version 2.0 (the "License");
        you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 <%@ include file="../common/IncludeTop.jsp"%>
 
 <div id="BackLink"><stripes:link
-	beanclass="org.mybatis.jpetstore.web.actions.CatalogActionBean">
+	beanclass="org.mybatis.jpetstore.catalog.web.CatalogActionBean">
 	Return to Main Menu</stripes:link></div>
 
 <div id="Catalog">
@@ -27,7 +27,7 @@
 
 <h2>Shopping Cart</h2>
 <stripes:form
-	beanclass="org.mybatis.jpetstore.web.actions.CartActionBean">
+	beanclass="org.mybatis.jpetstore.cart.web.CartActionBean">
 	<table>
 		<tr>
 			<th><b>Item ID</b></th>
@@ -49,7 +49,7 @@
 		<c:forEach var="cartItem" items="${actionBean.cart.cartItems}">
 			<tr>
 				<td><stripes:link
-					beanclass="org.mybatis.jpetstore.web.actions.CatalogActionBean"
+					beanclass="org.mybatis.jpetstore.catalog.web.CatalogActionBean"
 					event="viewItem">
 					<stripes:param name="itemId" value="${cartItem.item.itemId}" />
 				${cartItem.item.itemId}
@@ -66,7 +66,7 @@
 				<td>$<fmt:formatNumber value="${cartItem.total}"
 					pattern="#,##0.00" /></td>
 				<td><stripes:link class="Button"
-					beanclass="org.mybatis.jpetstore.web.actions.CartActionBean"
+					beanclass="org.mybatis.jpetstore.cart.web.CartActionBean"
 					event="removeItemFromCart">
 					<stripes:param name="workingItemId" value="${cartItem.item.itemId}" />
             	Remove
@@ -83,7 +83,7 @@
 
 </stripes:form> <c:if test="${actionBean.cart.numberOfItems > 0}">
 	<stripes:link class="Button"
-		beanclass="org.mybatis.jpetstore.web.actions.OrderActionBean"
+		beanclass="org.mybatis.jpetstore.order.web.OrderActionBean"
 		event="newOrderForm">
       	Proceed to Checkout
       </stripes:link>
