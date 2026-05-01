@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import org.mybatis.jpetstore.account.domain.Account;
 import org.mybatis.jpetstore.cart.domain.Cart;
 import org.mybatis.jpetstore.cart.domain.CartItem;
 

@@ -25,13 +25,13 @@ import javax.servlet.http.HttpSession;
 
 import org.junit.jupiter.api.Test;
 import org.mybatis.jpetstore.account.api.CustomerProfile;
+import org.mybatis.jpetstore.account.domain.Account;
+import org.mybatis.jpetstore.account.web.AccountActionBean;
 import org.mybatis.jpetstore.cart.api.CartSnapshot;
 import org.mybatis.jpetstore.cart.domain.Cart;
 import org.mybatis.jpetstore.cart.web.CartActionBean;
 import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
 import org.mybatis.jpetstore.catalog.api.ProductSummary;
-import org.mybatis.jpetstore.domain.Account;
-import org.mybatis.jpetstore.web.actions.AccountActionBean;
 import org.springframework.test.util.ReflectionTestUtils;
 
 class SessionStateTest {

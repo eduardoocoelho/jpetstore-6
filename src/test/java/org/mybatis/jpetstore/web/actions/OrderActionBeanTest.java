@@ -36,10 +36,11 @@ import net.sourceforge.stripes.controller.ActionResolver;
 import net.sourceforge.stripes.controller.StripesFilter;
 
 import org.junit.jupiter.api.Test;
+import org.mybatis.jpetstore.account.domain.Account;
+import org.mybatis.jpetstore.account.web.AccountActionBean;
 import org.mybatis.jpetstore.cart.domain.Cart;
 import org.mybatis.jpetstore.cart.web.CartActionBean;
 import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
-import org.mybatis.jpetstore.domain.Account;
 import org.mybatis.jpetstore.domain.Order;
 import org.mybatis.jpetstore.order.application.OrderFactory;
 import org.mybatis.jpetstore.service.OrderService;

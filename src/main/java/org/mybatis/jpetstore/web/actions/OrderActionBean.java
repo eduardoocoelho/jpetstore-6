@@ -25,6 +25,7 @@ import net.sourceforge.stripes.action.SessionScope;
 import net.sourceforge.stripes.integration.spring.SpringBean;
 
 import org.mybatis.jpetstore.account.api.CustomerProfile;
+import org.mybatis.jpetstore.account.web.AccountActionBean;
 import org.mybatis.jpetstore.cart.api.CartSnapshot;
 import org.mybatis.jpetstore.domain.Order;
 import org.mybatis.jpetstore.order.application.OrderFactory;

@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.mybatis.jpetstore.service;
+package org.mybatis.jpetstore.account.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
@@ -27,8 +27,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mybatis.jpetstore.account.api.AccountQueryService;
 import org.mybatis.jpetstore.account.api.CustomerProfile;
-import org.mybatis.jpetstore.domain.Account;
-import org.mybatis.jpetstore.mapper.AccountMapper;
+import org.mybatis.jpetstore.account.domain.Account;
+import org.mybatis.jpetstore.account.persistence.AccountMapper;
 
 /**
  * @author Eduardo Macarron

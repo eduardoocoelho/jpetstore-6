@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 import org.junit.jupiter.api.Test;
+import org.mybatis.jpetstore.account.domain.Account;
 import org.mybatis.jpetstore.cart.domain.Cart;
 import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
 

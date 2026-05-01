@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.mybatis.jpetstore.web.actions;
+package org.mybatis.jpetstore.account.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -35,11 +35,11 @@ import net.sourceforge.stripes.controller.ActionResolver;
 import net.sourceforge.stripes.controller.StripesFilter;
 
 import org.junit.jupiter.api.Test;
-import org.mybatis.jpetstore.catalog.application.CatalogService;
-import org.mybatis.jpetstore.catalog.domain.Product;
+import org.mybatis.jpetstore.account.application.AccountService;
+import org.mybatis.jpetstore.account.domain.Account;
+import org.mybatis.jpetstore.catalog.api.CatalogQueryService;
+import org.mybatis.jpetstore.catalog.api.ProductSummary;
 import org.mybatis.jpetstore.catalog.web.CatalogActionBean;
-import org.mybatis.jpetstore.domain.Account;
-import org.mybatis.jpetstore.service.AccountService;
 import org.springframework.test.util.ReflectionTestUtils;
 
 class AccountActionBeanTest {
@@ -140,11 +140,11 @@ class AccountActionBeanTest {
   void signonLoadsAccountFavoriteCategoryProductListAndRegistersSessionAlias() {
     AccountActionBean accountActionBean = new AccountActionBean();
     AccountService accountService = mock(AccountService.class);
-    CatalogService catalogService = mock(CatalogService.class);
+    CatalogQueryService catalogQueryService = mock(CatalogQueryService.class);
     ActionBeanContext context = mock(ActionBeanContext.class);
     HttpServletRequest request = mock(HttpServletRequest.class);
     HttpSession session = mock(HttpSession.class);
-    List<Product> favoriteProducts = List.of(new Product());
+    List<ProductSummary> favoriteProducts = List.of(new ProductSummary("K9-BD-01", "DOGS", "Bulldog", "Friendly"));
 
     Account account = new Account();
     account.setUsername("j2ee");
@@ -153,11 +153,11 @@ class AccountActionBeanTest {
     account.setFavouriteCategoryId("DOGS");
 
     ReflectionTestUtils.setField(accountActionBean, "accountService", accountService);
-    ReflectionTestUtils.setField(accountActionBean, "catalogService", catalogService);
+    ReflectionTestUtils.setField(accountActionBean, "catalogQueryService", catalogQueryService);
     when(context.getRequest()).thenReturn(request);
     when(request.getSession()).thenReturn(session);
     when(accountService.getAccount("j2ee", "j2ee")).thenReturn(account);
-    when(catalogService.getProductListByCategory("DOGS")).thenReturn(favoriteProducts);
+    when(catalogQueryService.getProductsByCategory("DOGS")).thenReturn(favoriteProducts);
     configureStripesActionResolver();
     accountActionBean.setContext(context);
     accountActionBean.setUsername("j2ee");

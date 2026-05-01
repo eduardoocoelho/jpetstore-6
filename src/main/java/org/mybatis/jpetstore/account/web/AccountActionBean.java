@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.mybatis.jpetstore.web.actions;
+package org.mybatis.jpetstore.account.web;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -26,14 +26,16 @@ import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.RedirectResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.SessionScope;
+import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.integration.spring.SpringBean;
 import net.sourceforge.stripes.validation.Validate;
 
-import org.mybatis.jpetstore.catalog.application.CatalogService;
-import org.mybatis.jpetstore.catalog.domain.Product;
+import org.mybatis.jpetstore.account.application.AccountService;
+import org.mybatis.jpetstore.account.domain.Account;
+import org.mybatis.jpetstore.catalog.api.CatalogQueryService;
+import org.mybatis.jpetstore.catalog.api.ProductSummary;
 import org.mybatis.jpetstore.catalog.web.CatalogActionBean;
-import org.mybatis.jpetstore.domain.Account;
-import org.mybatis.jpetstore.service.AccountService;
+import org.mybatis.jpetstore.web.actions.AbstractActionBean;
 
 /**
  * The Class AccountActionBean.
@@ -41,6 +43,7 @@ import org.mybatis.jpetstore.service.AccountService;
  * @author Eduardo Macarron
  */
 @SessionScope
+@UrlBinding("/actions/Account.action")
 public class AccountActionBean extends AbstractActionBean {
 
   private static final long serialVersionUID = 5499663666155758178L;
@@ -55,10 +58,10 @@ public class AccountActionBean extends AbstractActionBean {
   @SpringBean
   private transient AccountService accountService;
   @SpringBean
-  private transient CatalogService catalogService;
+  private transient CatalogQueryService catalogQueryService;
 
   private Account account = new Account();
-  private List<Product> myList;
+  private List<ProductSummary> myList;
   private boolean authenticated;
 
   static {
@@ -88,11 +91,11 @@ public class AccountActionBean extends AbstractActionBean {
     account.setPassword(password);
   }
 
-  public List<Product> getMyList() {
+  public List<ProductSummary> getMyList() {
     return myList;
   }
 
-  public void setMyList(List<Product> myList) {
+  public void setMyList(List<ProductSummary> myList) {
     this.myList = myList;
   }
 
@@ -116,7 +119,7 @@ public class AccountActionBean extends AbstractActionBean {
   public Resolution newAccount() {
     accountService.insertAccount(account);
     account = accountService.getAccount(account.getUsername());
-    myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());
+    myList = catalogQueryService.getProductsByCategory(account.getFavouriteCategoryId());
     authenticated = true;
     return new RedirectResolution(CatalogActionBean.class);
   }
@@ -138,7 +141,7 @@ public class AccountActionBean extends AbstractActionBean {
   public Resolution editAccount() {
     accountService.updateAccount(account);
     account = accountService.getAccount(account.getUsername());
-    myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());
+    myList = catalogQueryService.getProductsByCategory(account.getFavouriteCategoryId());
     return new RedirectResolution(CatalogActionBean.class);
   }
 
@@ -168,7 +171,7 @@ public class AccountActionBean extends AbstractActionBean {
       return new ForwardResolution(SIGNON);
     } else {
       account.setPassword(null);
-      myList = catalogService.getProductListByCategory(account.getFavouriteCategoryId());
+      myList = catalogQueryService.getProductsByCategory(account.getFavouriteCategoryId());
       authenticated = true;
       HttpSession s = context.getRequest().getSession();
       // this bean is already registered as /actions/Account.action
