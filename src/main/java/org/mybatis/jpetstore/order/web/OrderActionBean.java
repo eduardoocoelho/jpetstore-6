@@ -31,8 +31,8 @@ import org.mybatis.jpetstore.cart.api.CartSnapshot;
 import org.mybatis.jpetstore.order.application.OrderFactory;
 import org.mybatis.jpetstore.order.application.OrderService;
 import org.mybatis.jpetstore.order.domain.Order;
+import org.mybatis.jpetstore.shared.web.AbstractActionBean;
 import org.mybatis.jpetstore.shared.web.SessionState;
-import org.mybatis.jpetstore.web.actions.AbstractActionBean;
 
 /**
  * The Class OrderActionBean.
@@ -124,8 +124,8 @@ public class OrderActionBean extends AbstractActionBean {
    */
   public Resolution newOrderForm() {
     SessionState sessionState = getSessionState();
-    CustomerProfile customer = sessionState.getCurrentCustomerProfile();
-    CartSnapshot cart = sessionState.getCurrentCartSnapshot();
+    CustomerProfile customer = sessionState.getCurrentCustomerProfile(CustomerProfile.class);
+    CartSnapshot cart = sessionState.getCurrentCartSnapshot(CartSnapshot.class);
 
     clear();
     if (!sessionState.isAuthenticated()) {

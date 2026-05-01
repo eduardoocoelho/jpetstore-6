@@ -30,12 +30,14 @@ import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.integration.spring.SpringBean;
 import net.sourceforge.stripes.validation.Validate;
 
+import org.mybatis.jpetstore.account.api.CustomerProfile;
 import org.mybatis.jpetstore.account.application.AccountService;
 import org.mybatis.jpetstore.account.domain.Account;
 import org.mybatis.jpetstore.catalog.api.CatalogQueryService;
 import org.mybatis.jpetstore.catalog.api.ProductSummary;
 import org.mybatis.jpetstore.catalog.web.CatalogActionBean;
-import org.mybatis.jpetstore.web.actions.AbstractActionBean;
+import org.mybatis.jpetstore.shared.web.AbstractActionBean;
+import org.mybatis.jpetstore.shared.web.SessionAccount;
 
 /**
  * The Class AccountActionBean.
@@ -44,7 +46,7 @@ import org.mybatis.jpetstore.web.actions.AbstractActionBean;
  */
 @SessionScope
 @UrlBinding("/actions/Account.action")
-public class AccountActionBean extends AbstractActionBean {
+public class AccountActionBean extends AbstractActionBean implements SessionAccount {
 
   private static final long serialVersionUID = 5499663666155758178L;
 
@@ -198,6 +200,21 @@ public class AccountActionBean extends AbstractActionBean {
    */
   public boolean isAuthenticated() {
     return authenticated && account != null && account.getUsername() != null;
+  }
+
+  @Override
+  public String getCurrentUsername() {
+    return account == null ? null : account.getUsername();
+  }
+
+  @Override
+  public CustomerProfile getCurrentCustomerProfile() {
+    if (account == null) {
+      return null;
+    }
+    return new CustomerProfile(account.getUsername(), account.getEmail(), account.getFirstName(), account.getLastName(),
+        account.getAddress1(), account.getAddress2(), account.getCity(), account.getState(), account.getZip(),
+        account.getCountry(), account.getPhone(), account.getFavouriteCategoryId(), account.getLanguagePreference());
   }
 
   /**

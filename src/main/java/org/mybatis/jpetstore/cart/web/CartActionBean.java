@@ -15,6 +15,7 @@
  */
 package org.mybatis.jpetstore.cart.web;
 
+import java.math.BigDecimal;
 import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,11 +26,14 @@ import net.sourceforge.stripes.action.SessionScope;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.integration.spring.SpringBean;
 
+import org.mybatis.jpetstore.cart.api.CartQueryService;
+import org.mybatis.jpetstore.cart.api.CartSnapshot;
 import org.mybatis.jpetstore.cart.application.CartService;
 import org.mybatis.jpetstore.cart.domain.Cart;
 import org.mybatis.jpetstore.cart.domain.CartItem;
 import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
-import org.mybatis.jpetstore.web.actions.AbstractActionBean;
+import org.mybatis.jpetstore.shared.web.AbstractActionBean;
+import org.mybatis.jpetstore.shared.web.SessionCart;
 
 /**
  * The Class CartActionBean.
@@ -38,12 +42,13 @@ import org.mybatis.jpetstore.web.actions.AbstractActionBean;
  */
 @SessionScope
 @UrlBinding("/actions/Cart.action")
-public class CartActionBean extends AbstractActionBean {
+public class CartActionBean extends AbstractActionBean implements SessionCart {
 
   private static final long serialVersionUID = -4038684592582714235L;
 
   private static final String VIEW_CART = "/WEB-INF/jsp/cart/Cart.jsp";
   private static final String CHECK_OUT = "/WEB-INF/jsp/cart/Checkout.jsp";
+  private static final CartQueryService CART_QUERY_SERVICE = new ActionCartQueryService();
 
   @SpringBean
   private transient CartService cartService;
@@ -136,9 +141,37 @@ public class CartActionBean extends AbstractActionBean {
     return new ForwardResolution(CHECK_OUT);
   }
 
+  @Override
+  public CartSnapshot getCurrentCartSnapshot() {
+    return cart == null ? null : CART_QUERY_SERVICE.getCartSnapshot(cart);
+  }
+
+  @Override
+  public void clearCart() {
+    clear();
+  }
+
   public void clear() {
     cart = new Cart();
     workingItemId = null;
+  }
+
+  private static class ActionCartQueryService implements CartQueryService {
+
+    @Override
+    public Iterator<CartItem> getAllCartItems(Cart cart) {
+      return cart.getAllCartItems();
+    }
+
+    @Override
+    public int getNumberOfItems(Cart cart) {
+      return cart.getNumberOfItems();
+    }
+
+    @Override
+    public BigDecimal getSubTotal(Cart cart) {
+      return cart.getSubTotal();
+    }
   }
 
 }

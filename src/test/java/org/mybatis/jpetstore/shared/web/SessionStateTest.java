@@ -43,7 +43,7 @@ class SessionStateTest {
 
     assertThat(sessionState.isAuthenticated()).isFalse();
     assertThat(sessionState.getCurrentUsername()).isNull();
-    assertThat(sessionState.getCurrentCustomerProfile()).isNull();
+    assertThat(sessionState.getCurrentCustomerProfile(CustomerProfile.class)).isNull();
   }
 
   @Test
@@ -53,7 +53,7 @@ class SessionStateTest {
     when(session.getAttribute(SessionState.ACCOUNT_ACTION_SESSION_KEY)).thenReturn(accountBean);
     SessionState sessionState = new SessionState(session);
 
-    CustomerProfile customerProfile = sessionState.getCurrentCustomerProfile();
+    CustomerProfile customerProfile = sessionState.getCurrentCustomerProfile(CustomerProfile.class);
 
     assertThat(sessionState.isAuthenticated()).isTrue();
     assertThat(sessionState.getCurrentUsername()).isEqualTo("j2ee");
@@ -91,7 +91,7 @@ class SessionStateTest {
     when(session.getAttribute(SessionState.CART_ACTION_SESSION_KEY)).thenReturn(cartBean);
     SessionState sessionState = new SessionState(session);
 
-    CartSnapshot cartSnapshot = sessionState.getCurrentCartSnapshot();
+    CartSnapshot cartSnapshot = sessionState.getCurrentCartSnapshot(CartSnapshot.class);
 
     assertThat(cartSnapshot.numberOfItems()).isEqualTo(1);
     assertThat(cartSnapshot.subTotal()).isEqualTo(new BigDecimal("33.00"));
@@ -107,7 +107,7 @@ class SessionStateTest {
     HttpSession session = mock(HttpSession.class);
     SessionState sessionState = new SessionState(session);
 
-    assertThat(sessionState.getCurrentCartSnapshot()).isNull();
+    assertThat(sessionState.getCurrentCartSnapshot(CartSnapshot.class)).isNull();
   }
 
   @Test
