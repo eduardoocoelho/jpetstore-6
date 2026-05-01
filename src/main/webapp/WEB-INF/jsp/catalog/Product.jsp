@@ -1,6 +1,6 @@
 <%--
 
-       Copyright 2010-2022 the original author or authors.
+       Copyright 2010-2026 the original author or authors.
 
        Licensed under the Apache License, Version 2.0 (the "License");
        you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@
 <%@ include file="../common/IncludeTop.jsp"%>
 
 <jsp:useBean id="catalog"
-	class="org.mybatis.jpetstore.web.actions.CatalogActionBean" />
+	class="org.mybatis.jpetstore.catalog.web.CatalogActionBean" />
 
 <div id="BackLink"><stripes:link
-	beanclass="org.mybatis.jpetstore.web.actions.CatalogActionBean"
+	beanclass="org.mybatis.jpetstore.catalog.web.CatalogActionBean"
 	event="viewCategory">
 	<stripes:param name="categoryId"
 		value="${actionBean.product.categoryId}" />
@@ -43,7 +43,7 @@
 	<c:forEach var="item" items="${actionBean.itemList}">
 		<tr>
 			<td><stripes:link
-				beanclass="org.mybatis.jpetstore.web.actions.CatalogActionBean"
+				beanclass="org.mybatis.jpetstore.catalog.web.CatalogActionBean"
 				event="viewItem">
 				<stripes:param name="itemId" value="${item.itemId}" />
 				${item.itemId}

@@ -1,5 +1,5 @@
 /*
- *    Copyright 2010-2022 the original author or authors.
+ *    Copyright 2010-2026 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,29 +13,38 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.mybatis.jpetstore.domain;
+package org.mybatis.jpetstore.catalog.domain;
 
 import java.io.Serializable;
 
 /**
- * The Class Category.
+ * The Class Product.
  *
  * @author Eduardo Macarron
  */
-public class Category implements Serializable {
+public class Product implements Serializable {
 
-  private static final long serialVersionUID = 3992469837058393712L;
+  private static final long serialVersionUID = -7492639752670189553L;
 
+  private String productId;
   private String categoryId;
   private String name;
   private String description;
+
+  public String getProductId() {
+    return productId;
+  }
+
+  public void setProductId(String productId) {
+    this.productId = productId.trim();
+  }
 
   public String getCategoryId() {
     return categoryId;
   }
 
   public void setCategoryId(String categoryId) {
-    this.categoryId = categoryId.trim();
+    this.categoryId = categoryId;
   }
 
   public String getName() {
@@ -56,7 +65,7 @@ public class Category implements Serializable {
 
   @Override
   public String toString() {
-    return getCategoryId();
+    return getName();
   }
 
 }

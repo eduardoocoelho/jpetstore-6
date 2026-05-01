@@ -1,5 +1,5 @@
 /*
- *    Copyright 2010-2022 the original author or authors.
+ *    Copyright 2010-2026 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.mybatis.jpetstore.web.actions;
+package org.mybatis.jpetstore.catalog.web;
 
 import java.util.List;
 
@@ -22,10 +22,11 @@ import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.SessionScope;
 import net.sourceforge.stripes.integration.spring.SpringBean;
 
-import org.mybatis.jpetstore.domain.Category;
-import org.mybatis.jpetstore.domain.Item;
-import org.mybatis.jpetstore.domain.Product;
-import org.mybatis.jpetstore.service.CatalogService;
+import org.mybatis.jpetstore.catalog.application.CatalogService;
+import org.mybatis.jpetstore.catalog.domain.Category;
+import org.mybatis.jpetstore.catalog.domain.Item;
+import org.mybatis.jpetstore.catalog.domain.Product;
+import org.mybatis.jpetstore.web.actions.AbstractActionBean;
 
 /**
  * The Class CatalogActionBean.

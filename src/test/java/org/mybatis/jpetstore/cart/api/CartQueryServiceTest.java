@@ -21,10 +21,10 @@ import java.math.BigDecimal;
 import java.util.Iterator;
 
 import org.junit.jupiter.api.Test;
+import org.mybatis.jpetstore.catalog.domain.Item;
+import org.mybatis.jpetstore.catalog.domain.Product;
 import org.mybatis.jpetstore.domain.Cart;
 import org.mybatis.jpetstore.domain.CartItem;
-import org.mybatis.jpetstore.domain.Item;
-import org.mybatis.jpetstore.domain.Product;
 
 class CartQueryServiceTest {
 

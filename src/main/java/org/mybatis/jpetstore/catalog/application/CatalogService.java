@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.mybatis.jpetstore.service;
+package org.mybatis.jpetstore.catalog.application;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,14 +21,14 @@ import java.util.List;
 import org.mybatis.jpetstore.catalog.api.CatalogQueryService;
 import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
 import org.mybatis.jpetstore.catalog.api.ProductSummary;
-import org.mybatis.jpetstore.domain.Category;
-import org.mybatis.jpetstore.domain.Item;
-import org.mybatis.jpetstore.domain.Product;
+import org.mybatis.jpetstore.catalog.domain.Category;
+import org.mybatis.jpetstore.catalog.domain.Item;
+import org.mybatis.jpetstore.catalog.domain.Product;
+import org.mybatis.jpetstore.catalog.persistence.CategoryMapper;
+import org.mybatis.jpetstore.catalog.persistence.ItemMapper;
+import org.mybatis.jpetstore.catalog.persistence.ProductMapper;
 import org.mybatis.jpetstore.inventory.api.InventoryQueryService;
 import org.mybatis.jpetstore.inventory.api.InventoryStatus;
-import org.mybatis.jpetstore.mapper.CategoryMapper;
-import org.mybatis.jpetstore.mapper.ItemMapper;
-import org.mybatis.jpetstore.mapper.ProductMapper;
 import org.springframework.stereotype.Service;
 
 /**

@@ -1,5 +1,5 @@
 /*
- *    Copyright 2010-2022 the original author or authors.
+ *    Copyright 2010-2026 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,11 +13,11 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.mybatis.jpetstore.mapper;
+package org.mybatis.jpetstore.catalog.persistence;
 
 import java.util.List;
 
-import org.mybatis.jpetstore.domain.Product;
+import org.mybatis.jpetstore.catalog.domain.Product;
 
 /**
  * The Interface ProductMapper.

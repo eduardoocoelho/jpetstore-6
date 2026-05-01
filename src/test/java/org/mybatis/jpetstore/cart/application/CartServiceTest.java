@@ -25,8 +25,8 @@ import java.math.BigDecimal;
 
 import org.junit.jupiter.api.Test;
 import org.mybatis.jpetstore.catalog.api.CatalogQueryService;
+import org.mybatis.jpetstore.catalog.domain.Item;
 import org.mybatis.jpetstore.domain.Cart;
-import org.mybatis.jpetstore.domain.Item;
 import org.mybatis.jpetstore.inventory.api.InventoryQueryService;
 
 class CartServiceTest {

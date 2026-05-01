@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.mybatis.jpetstore.mapper;
+package org.mybatis.jpetstore.catalog.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,7 +23,8 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mybatis.jpetstore.domain.Item;
+import org.mybatis.jpetstore.catalog.domain.Item;
+import org.mybatis.jpetstore.mapper.MapperTestContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;

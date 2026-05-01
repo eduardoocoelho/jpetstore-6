@@ -25,9 +25,9 @@ import net.sourceforge.stripes.action.SessionScope;
 import net.sourceforge.stripes.integration.spring.SpringBean;
 
 import org.mybatis.jpetstore.cart.application.CartService;
+import org.mybatis.jpetstore.catalog.domain.Item;
 import org.mybatis.jpetstore.domain.Cart;
 import org.mybatis.jpetstore.domain.CartItem;
-import org.mybatis.jpetstore.domain.Item;
 
 /**
  * The Class CartActionBean.

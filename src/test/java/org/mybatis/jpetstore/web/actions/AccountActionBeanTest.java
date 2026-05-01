@@ -35,10 +35,11 @@ import net.sourceforge.stripes.controller.ActionResolver;
 import net.sourceforge.stripes.controller.StripesFilter;
 
 import org.junit.jupiter.api.Test;
+import org.mybatis.jpetstore.catalog.application.CatalogService;
+import org.mybatis.jpetstore.catalog.domain.Product;
+import org.mybatis.jpetstore.catalog.web.CatalogActionBean;
 import org.mybatis.jpetstore.domain.Account;
-import org.mybatis.jpetstore.domain.Product;
 import org.mybatis.jpetstore.service.AccountService;
-import org.mybatis.jpetstore.service.CatalogService;
 import org.springframework.test.util.ReflectionTestUtils;
 
 class AccountActionBeanTest {

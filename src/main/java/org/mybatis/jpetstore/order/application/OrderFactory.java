@@ -22,10 +22,10 @@ import org.mybatis.jpetstore.cart.api.CartLineSnapshot;
 import org.mybatis.jpetstore.cart.api.CartSnapshot;
 import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
 import org.mybatis.jpetstore.catalog.api.ProductSummary;
-import org.mybatis.jpetstore.domain.Item;
+import org.mybatis.jpetstore.catalog.domain.Item;
+import org.mybatis.jpetstore.catalog.domain.Product;
 import org.mybatis.jpetstore.domain.LineItem;
 import org.mybatis.jpetstore.domain.Order;
-import org.mybatis.jpetstore.domain.Product;
 import org.springframework.stereotype.Service;
 
 @Service

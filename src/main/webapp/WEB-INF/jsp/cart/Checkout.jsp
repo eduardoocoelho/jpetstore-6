@@ -1,6 +1,6 @@
 <%--
 
-       Copyright 2010-2023 the original author or authors.
+       Copyright 2010-2026 the original author or authors.
 
        Licensed under the Apache License, Version 2.0 (the "License");
        you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@
 			<c:forEach var="cartItem" items="${actionBean.cart.cartItems}">
 				<tr>
 					<td><stripes:link
-						beanclass="org.mybatis.jpetstore.web.actions.CatalogActionBean"
+						beanclass="org.mybatis.jpetstore.catalog.web.CatalogActionBean"
 						event="viewItem">
 						<stripes:param name="itemId" value="${cartItem.item.itemId}" />
 				  ${cartItem.item.itemId}

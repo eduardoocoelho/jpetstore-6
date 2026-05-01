@@ -34,8 +34,8 @@ import net.sourceforge.stripes.action.Resolution;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mybatis.jpetstore.cart.application.CartService;
+import org.mybatis.jpetstore.catalog.domain.Item;
 import org.mybatis.jpetstore.domain.Cart;
-import org.mybatis.jpetstore.domain.Item;
 import org.springframework.test.util.ReflectionTestUtils;
 
 class CartActionBeanTest {

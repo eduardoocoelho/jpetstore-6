@@ -16,8 +16,8 @@
 package org.mybatis.jpetstore.cart.application;
 
 import org.mybatis.jpetstore.catalog.api.CatalogQueryService;
+import org.mybatis.jpetstore.catalog.domain.Item;
 import org.mybatis.jpetstore.domain.Cart;
-import org.mybatis.jpetstore.domain.Item;
 import org.mybatis.jpetstore.inventory.api.InventoryQueryService;
 import org.springframework.stereotype.Service;
 

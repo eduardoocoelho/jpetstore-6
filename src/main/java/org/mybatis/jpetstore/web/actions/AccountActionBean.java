@@ -1,5 +1,5 @@
 /*
- *    Copyright 2010-2022 the original author or authors.
+ *    Copyright 2010-2026 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -29,10 +29,11 @@ import net.sourceforge.stripes.action.SessionScope;
 import net.sourceforge.stripes.integration.spring.SpringBean;
 import net.sourceforge.stripes.validation.Validate;
 
+import org.mybatis.jpetstore.catalog.application.CatalogService;
+import org.mybatis.jpetstore.catalog.domain.Product;
+import org.mybatis.jpetstore.catalog.web.CatalogActionBean;
 import org.mybatis.jpetstore.domain.Account;
-import org.mybatis.jpetstore.domain.Product;
 import org.mybatis.jpetstore.service.AccountService;
-import org.mybatis.jpetstore.service.CatalogService;
 
 /**
  * The Class AccountActionBean.

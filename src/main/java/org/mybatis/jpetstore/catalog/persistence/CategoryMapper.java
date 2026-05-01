@@ -13,21 +13,21 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.mybatis.jpetstore.mapper;
+package org.mybatis.jpetstore.catalog.persistence;
 
 import java.util.List;
 
-import org.mybatis.jpetstore.domain.Item;
+import org.mybatis.jpetstore.catalog.domain.Category;
 
 /**
- * The Interface ItemMapper.
+ * The Interface CategoryMapper.
  *
  * @author Eduardo Macarron
  */
-public interface ItemMapper {
+public interface CategoryMapper {
 
-  List<Item> getItemListByProduct(String productId);
+  List<Category> getCategoryList();
 
-  Item getItem(String itemId);
+  Category getCategory(String categoryId);
 
 }

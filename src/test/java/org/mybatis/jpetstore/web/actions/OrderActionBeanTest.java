@@ -36,9 +36,9 @@ import net.sourceforge.stripes.controller.ActionResolver;
 import net.sourceforge.stripes.controller.StripesFilter;
 
 import org.junit.jupiter.api.Test;
+import org.mybatis.jpetstore.catalog.domain.Item;
 import org.mybatis.jpetstore.domain.Account;
 import org.mybatis.jpetstore.domain.Cart;
-import org.mybatis.jpetstore.domain.Item;
 import org.mybatis.jpetstore.domain.Order;
 import org.mybatis.jpetstore.order.application.OrderFactory;
 import org.mybatis.jpetstore.service.OrderService;
