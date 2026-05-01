@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.mybatis.jpetstore.service;
+package org.mybatis.jpetstore.order.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
@@ -33,15 +33,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mybatis.jpetstore.catalog.api.CatalogQueryService;
 import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
 import org.mybatis.jpetstore.catalog.api.ProductSummary;
-import org.mybatis.jpetstore.domain.LineItem;
-import org.mybatis.jpetstore.domain.Order;
-import org.mybatis.jpetstore.domain.Sequence;
-import org.mybatis.jpetstore.inventory.api.InventoryQueryService;
 import org.mybatis.jpetstore.inventory.api.InventoryReservationService;
-import org.mybatis.jpetstore.mapper.LineItemMapper;
-import org.mybatis.jpetstore.mapper.OrderMapper;
-import org.mybatis.jpetstore.mapper.SequenceMapper;
 import org.mybatis.jpetstore.order.api.OrderQueryService;
+import org.mybatis.jpetstore.order.domain.LineItem;
+import org.mybatis.jpetstore.order.domain.Order;
+import org.mybatis.jpetstore.order.domain.Sequence;
+import org.mybatis.jpetstore.order.persistence.LineItemMapper;
+import org.mybatis.jpetstore.order.persistence.OrderMapper;
+import org.mybatis.jpetstore.order.persistence.SequenceMapper;
 
 /**
  * @author coderliux
@@ -51,8 +50,6 @@ class OrderServiceTest {
 
   @Mock
   private CatalogQueryService catalogQueryService;
-  @Mock
-  private InventoryQueryService inventoryQueryService;
   @Mock
   private InventoryReservationService inventoryReservationService;
   @Mock
@@ -104,15 +101,13 @@ class OrderServiceTest {
     ItemSnapshot itemSnapshot = new ItemSnapshot(itemId, "P01", product, new BigDecimal("16.50"), "P", "Large", null,
         null, null, null);
     when(catalogQueryService.getItemSnapshot(itemId)).thenReturn(itemSnapshot);
-    when(inventoryQueryService.getQuantity(itemId)).thenReturn(5);
 
     // then
     Order expectedOrder = orderService.getOrder(orderId);
     assertThat(expectedOrder).isEqualTo(order);
     assertThat(expectedOrder.getLineItems()).hasSize(1);
-    assertThat(expectedOrder.getLineItems().get(0).getItem().getQuantity()).isEqualTo(5);
-    assertThat(expectedOrder.getLineItems().get(0).getItem().getItemId()).isEqualTo(itemId);
-    assertThat(expectedOrder.getLineItems().get(0).getItem().getProduct().getProductId()).isEqualTo("P01");
+    assertThat(expectedOrder.getLineItems().get(0).getItem().itemId()).isEqualTo(itemId);
+    assertThat(expectedOrder.getLineItems().get(0).getItem().product().productId()).isEqualTo("P01");
   }
 
   @Test

@@ -21,11 +21,8 @@ import org.mybatis.jpetstore.account.api.CustomerProfile;
 import org.mybatis.jpetstore.cart.api.CartLineSnapshot;
 import org.mybatis.jpetstore.cart.api.CartSnapshot;
 import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
-import org.mybatis.jpetstore.catalog.api.ProductSummary;
-import org.mybatis.jpetstore.catalog.domain.Item;
-import org.mybatis.jpetstore.catalog.domain.Product;
-import org.mybatis.jpetstore.domain.LineItem;
-import org.mybatis.jpetstore.domain.Order;
+import org.mybatis.jpetstore.order.domain.LineItem;
+import org.mybatis.jpetstore.order.domain.Order;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -70,39 +67,13 @@ public class OrderFactory {
 
   private static LineItem toLineItem(int lineNumber, CartLineSnapshot cartLine) {
     LineItem lineItem = new LineItem();
-    Item item = toItem(cartLine.item());
+    ItemSnapshot item = cartLine.item();
     lineItem.setLineNumber(lineNumber);
-    lineItem.setItemId(item.getItemId());
-    lineItem.setUnitPrice(item.getListPrice());
+    lineItem.setItemId(item.itemId());
+    lineItem.setUnitPrice(item.listPrice());
     lineItem.setQuantity(cartLine.quantity());
     lineItem.setItem(item);
     return lineItem;
-  }
-
-  private static Item toItem(ItemSnapshot itemSnapshot) {
-    Item item = new Item();
-    item.setItemId(itemSnapshot.itemId());
-    item.setProduct(toProduct(itemSnapshot.product()));
-    item.setListPrice(itemSnapshot.listPrice());
-    item.setStatus(itemSnapshot.status());
-    item.setAttribute1(itemSnapshot.attribute1());
-    item.setAttribute2(itemSnapshot.attribute2());
-    item.setAttribute3(itemSnapshot.attribute3());
-    item.setAttribute4(itemSnapshot.attribute4());
-    item.setAttribute5(itemSnapshot.attribute5());
-    return item;
-  }
-
-  private static Product toProduct(ProductSummary productSummary) {
-    if (productSummary == null) {
-      return null;
-    }
-    Product product = new Product();
-    product.setProductId(productSummary.productId());
-    product.setCategoryId(productSummary.categoryId());
-    product.setName(productSummary.name());
-    product.setDescription(productSummary.description());
-    return product;
   }
 
 }

@@ -108,14 +108,13 @@ press continue...
 </table>
 
 <stripes:link class="Button"
-	beanclass="org.mybatis.jpetstore.web.actions.OrderActionBean"
+	beanclass="org.mybatis.jpetstore.order.web.OrderActionBean"
 	event="newOrder">
 	<stripes:param name="confirmed" value="true" />
 Confirm
 </stripes:link></div>
 
 <%@ include file="../common/IncludeBottom.jsp"%>
-
 
 
 

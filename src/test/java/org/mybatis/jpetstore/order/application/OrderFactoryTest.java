@@ -27,7 +27,7 @@ import org.mybatis.jpetstore.cart.api.CartLineSnapshot;
 import org.mybatis.jpetstore.cart.api.CartSnapshot;
 import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
 import org.mybatis.jpetstore.catalog.api.ProductSummary;
-import org.mybatis.jpetstore.domain.Order;
+import org.mybatis.jpetstore.order.domain.Order;
 
 class OrderFactoryTest {
 

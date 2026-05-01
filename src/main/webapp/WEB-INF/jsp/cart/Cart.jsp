@@ -83,7 +83,7 @@
 
 </stripes:form> <c:if test="${actionBean.cart.numberOfItems > 0}">
 	<stripes:link class="Button"
-		beanclass="org.mybatis.jpetstore.web.actions.OrderActionBean"
+		beanclass="org.mybatis.jpetstore.order.web.OrderActionBean"
 		event="newOrderForm">
       	Proceed to Checkout
       </stripes:link>

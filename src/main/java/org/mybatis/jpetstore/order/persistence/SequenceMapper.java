@@ -1,5 +1,5 @@
 /*
- *    Copyright 2010-2022 the original author or authors.
+ *    Copyright 2010-2026 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -13,21 +13,18 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.mybatis.jpetstore.mapper;
+package org.mybatis.jpetstore.order.persistence;
 
-import java.util.List;
-
-import org.mybatis.jpetstore.domain.LineItem;
+import org.mybatis.jpetstore.order.domain.Sequence;
 
 /**
- * The Interface LineItemMapper.
+ * The Interface SequenceMapper.
  *
  * @author Eduardo Macarron
  */
-public interface LineItemMapper {
+public interface SequenceMapper {
 
-  List<LineItem> getLineItemsByOrderId(int orderId);
+  Sequence getSequence(Sequence sequence);
 
-  void insertLineItem(LineItem lineItem);
-
+  void updateSequence(Sequence sequence);
 }

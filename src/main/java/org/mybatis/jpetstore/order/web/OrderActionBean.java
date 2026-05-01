@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.mybatis.jpetstore.web.actions;
+package org.mybatis.jpetstore.order.web;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,15 +22,17 @@ import java.util.List;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.Resolution;
 import net.sourceforge.stripes.action.SessionScope;
+import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.integration.spring.SpringBean;
 
 import org.mybatis.jpetstore.account.api.CustomerProfile;
 import org.mybatis.jpetstore.account.web.AccountActionBean;
 import org.mybatis.jpetstore.cart.api.CartSnapshot;
-import org.mybatis.jpetstore.domain.Order;
 import org.mybatis.jpetstore.order.application.OrderFactory;
-import org.mybatis.jpetstore.service.OrderService;
+import org.mybatis.jpetstore.order.application.OrderService;
+import org.mybatis.jpetstore.order.domain.Order;
 import org.mybatis.jpetstore.shared.web.SessionState;
+import org.mybatis.jpetstore.web.actions.AbstractActionBean;
 
 /**
  * The Class OrderActionBean.
@@ -38,6 +40,7 @@ import org.mybatis.jpetstore.shared.web.SessionState;
  * @author Eduardo Macarron
  */
 @SessionScope
+@UrlBinding("/actions/Order.action")
 public class OrderActionBean extends AbstractActionBean {
 
   private static final long serialVersionUID = -6171288227470176272L;

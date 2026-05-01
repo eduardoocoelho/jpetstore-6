@@ -13,16 +13,35 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.mybatis.jpetstore.order.api;
+package org.mybatis.jpetstore.order.domain;
 
-import java.util.List;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.mybatis.jpetstore.order.domain.Order;
+import java.util.Date;
 
-public interface OrderQueryService {
+import org.junit.jupiter.api.Test;
 
-  Order getOrder(int orderId);
+class OrderTest {
 
-  List<Order> getOrdersByUsername(String username);
+  @Test
+  void shouldAddLineItem() {
+    Order order = new Order();
+    LineItem lineItem = new LineItem();
+    lineItem.setLineNumber(1);
+
+    order.addLineItem(lineItem);
+
+    assertThat(order.getLineItems()).containsExactly(lineItem);
+  }
+
+  @Test
+  void shouldSetOrderDate() {
+    Order order = new Order();
+    Date orderDate = new Date();
+
+    order.setOrderDate(orderDate);
+
+    assertThat(order.getOrderDate()).isSameAs(orderDate);
+  }
 
 }

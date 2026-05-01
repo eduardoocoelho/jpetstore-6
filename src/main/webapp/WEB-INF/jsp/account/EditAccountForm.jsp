@@ -42,7 +42,7 @@
 	<stripes:submit name="editAccount" value="Save Account Information" />
 
 </stripes:form> <stripes:link
-	beanclass="org.mybatis.jpetstore.web.actions.OrderActionBean"
+	beanclass="org.mybatis.jpetstore.order.web.OrderActionBean"
 	event="listOrders">My Orders</stripes:link></div>
 
 <%@ include file="../common/IncludeBottom.jsp"%>

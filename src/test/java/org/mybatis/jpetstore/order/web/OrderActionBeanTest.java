@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.mybatis.jpetstore.web.actions;
+package org.mybatis.jpetstore.order.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -41,9 +41,9 @@ import org.mybatis.jpetstore.account.web.AccountActionBean;
 import org.mybatis.jpetstore.cart.domain.Cart;
 import org.mybatis.jpetstore.cart.web.CartActionBean;
 import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
-import org.mybatis.jpetstore.domain.Order;
 import org.mybatis.jpetstore.order.application.OrderFactory;
-import org.mybatis.jpetstore.service.OrderService;
+import org.mybatis.jpetstore.order.application.OrderService;
+import org.mybatis.jpetstore.order.domain.Order;
 import org.springframework.test.util.ReflectionTestUtils;
 
 class OrderActionBeanTest {

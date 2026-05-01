@@ -13,18 +13,13 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.mybatis.jpetstore.domain;
+package org.mybatis.jpetstore.order.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-
-import org.mybatis.jpetstore.account.domain.Account;
-import org.mybatis.jpetstore.cart.domain.Cart;
-import org.mybatis.jpetstore.cart.domain.CartItem;
 
 /**
  * The Class Order.
@@ -277,63 +272,6 @@ public class Order implements Serializable {
 
   public List<LineItem> getLineItems() {
     return lineItems;
-  }
-
-  /**
-   * Inits the order.
-   *
-   * @deprecated transitional compatibility path. New checkout code should use
-   *             {@code OrderFactory#createOrder(CustomerProfile, CartSnapshot)}.
-   *
-   * @param account
-   *          the account
-   * @param cart
-   *          the cart
-   */
-  @Deprecated
-  public void initOrder(Account account, Cart cart) {
-
-    username = account.getUsername();
-    orderDate = new Date();
-
-    shipToFirstName = account.getFirstName();
-    shipToLastName = account.getLastName();
-    shipAddress1 = account.getAddress1();
-    shipAddress2 = account.getAddress2();
-    shipCity = account.getCity();
-    shipState = account.getState();
-    shipZip = account.getZip();
-    shipCountry = account.getCountry();
-
-    billToFirstName = account.getFirstName();
-    billToLastName = account.getLastName();
-    billAddress1 = account.getAddress1();
-    billAddress2 = account.getAddress2();
-    billCity = account.getCity();
-    billState = account.getState();
-    billZip = account.getZip();
-    billCountry = account.getCountry();
-
-    totalPrice = cart.getSubTotal();
-
-    creditCard = "999 9999 9999 9999";
-    expiryDate = "12/03";
-    cardType = "Visa";
-    courier = "UPS";
-    locale = "CA";
-    status = "P";
-
-    Iterator<CartItem> i = cart.getAllCartItems();
-    while (i.hasNext()) {
-      CartItem cartItem = i.next();
-      addLineItem(cartItem);
-    }
-
-  }
-
-  public void addLineItem(CartItem cartItem) {
-    LineItem lineItem = new LineItem(lineItems.size() + 1, cartItem);
-    addLineItem(lineItem);
   }
 
   public void addLineItem(LineItem lineItem) {
