@@ -16,8 +16,15 @@
 package org.mybatis.jpetstore.catalog.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.junit.jupiter.api.Test;
+import org.mybatis.jpetstore.catalog.application.CatalogService;
+import org.mybatis.jpetstore.catalog.domain.Item;
+import org.mybatis.jpetstore.catalog.domain.Product;
+import org.mybatis.jpetstore.inventory.api.InventoryStatus;
+import org.springframework.test.util.ReflectionTestUtils;
 
 class CatalogActionBeanTest {
 
@@ -66,6 +73,28 @@ class CatalogActionBeanTest {
     // Act and Assert result
     assertThat(catalogActionBean.getItem()).isNull();
 
+  }
+
+  @Test
+  void viewItemLoadsCatalogItemAndInventoryStatusSeparately() {
+    CatalogActionBean catalogActionBean = new CatalogActionBean();
+    CatalogService catalogService = mock(CatalogService.class);
+    Product product = new Product();
+    product.setProductId("FI-SW-01");
+    Item item = new Item();
+    item.setItemId("EST-1");
+    item.setProduct(product);
+    InventoryStatus inventoryStatus = new InventoryStatus("EST-1", 10000, true);
+    ReflectionTestUtils.setField(catalogActionBean, "catalogService", catalogService);
+    when(catalogService.getItem("EST-1")).thenReturn(item);
+    when(catalogService.getInventoryStatus("EST-1")).thenReturn(inventoryStatus);
+    catalogActionBean.setItemId("EST-1");
+
+    catalogActionBean.viewItem();
+
+    assertThat(catalogActionBean.getItem()).isSameAs(item);
+    assertThat(catalogActionBean.getProduct()).isSameAs(product);
+    assertThat(catalogActionBean.getInventoryStatus()).isSameAs(inventoryStatus);
   }
 
   // Test written by Diffblue Cover.

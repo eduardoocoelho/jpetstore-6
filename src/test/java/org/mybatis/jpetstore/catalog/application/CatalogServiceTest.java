@@ -249,7 +249,6 @@ class CatalogServiceTest {
     item.setStatus("P");
     item.setAttribute1("Large");
     item.setAttribute2("Male");
-    item.setQuantity(7);
 
     // when
     when(itemMapper.getItem(itemCode)).thenReturn(item);

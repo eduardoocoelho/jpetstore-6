@@ -16,4 +16,16 @@
 package org.mybatis.jpetstore.inventory.api;
 
 public record InventoryStatus(String itemId, int quantity, boolean inStock) {
+
+  public String getItemId() {
+    return itemId;
+  }
+
+  public int getQuantity() {
+    return quantity;
+  }
+
+  public boolean isInStock() {
+    return inStock;
+  }
 }

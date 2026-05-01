@@ -26,6 +26,7 @@ import org.mybatis.jpetstore.catalog.application.CatalogService;
 import org.mybatis.jpetstore.catalog.domain.Category;
 import org.mybatis.jpetstore.catalog.domain.Item;
 import org.mybatis.jpetstore.catalog.domain.Product;
+import org.mybatis.jpetstore.inventory.api.InventoryStatus;
 import org.mybatis.jpetstore.shared.web.AbstractActionBean;
 
 /**
@@ -59,6 +60,7 @@ public class CatalogActionBean extends AbstractActionBean {
 
   private String itemId;
   private Item item;
+  private InventoryStatus inventoryStatus;
   private List<Item> itemList;
 
   public String getKeyword() {
@@ -115,6 +117,14 @@ public class CatalogActionBean extends AbstractActionBean {
 
   public void setItem(Item item) {
     this.item = item;
+  }
+
+  public InventoryStatus getInventoryStatus() {
+    return inventoryStatus;
+  }
+
+  public void setInventoryStatus(InventoryStatus inventoryStatus) {
+    this.inventoryStatus = inventoryStatus;
   }
 
   public List<Category> getCategoryList() {
@@ -179,6 +189,7 @@ public class CatalogActionBean extends AbstractActionBean {
    */
   public ForwardResolution viewItem() {
     item = catalogService.getItem(itemId);
+    inventoryStatus = catalogService.getInventoryStatus(itemId);
     product = item.getProduct();
     return new ForwardResolution(VIEW_ITEM);
   }
@@ -214,6 +225,7 @@ public class CatalogActionBean extends AbstractActionBean {
 
     itemId = null;
     item = null;
+    inventoryStatus = null;
     itemList = null;
   }
 
