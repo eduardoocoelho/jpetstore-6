@@ -41,7 +41,6 @@
         <init-param>
             <param-name>ActionResolver.Packages</param-name>
             <param-value>
-                org.mybatis.jpetstore.web,
                 org.mybatis.jpetstore.account.web,
                 org.mybatis.jpetstore.catalog.web,
                 org.mybatis.jpetstore.cart.web,

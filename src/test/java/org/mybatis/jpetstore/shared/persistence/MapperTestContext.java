@@ -13,7 +13,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-package org.mybatis.jpetstore.mapper;
+package org.mybatis.jpetstore.shared.persistence;
 
 import javax.sql.DataSource;
 
@@ -28,9 +28,8 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Configuration
-@MapperScan({ "org.mybatis.jpetstore.mapper", "org.mybatis.jpetstore.account.persistence",
-    "org.mybatis.jpetstore.catalog.persistence", "org.mybatis.jpetstore.inventory.persistence",
-    "org.mybatis.jpetstore.order.persistence" })
+@MapperScan({ "org.mybatis.jpetstore.account.persistence", "org.mybatis.jpetstore.catalog.persistence",
+    "org.mybatis.jpetstore.inventory.persistence", "org.mybatis.jpetstore.order.persistence" })
 public class MapperTestContext {
 
   @Bean
@@ -49,10 +48,8 @@ public class MapperTestContext {
   SqlSessionFactoryBean sqlSessionFactory() {
     SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
     factoryBean.setDataSource(dataSource());
-    factoryBean.setTypeAliasesPackage(
-        "org.mybatis.jpetstore.domain, org.mybatis.jpetstore.account.domain, org.mybatis.jpetstore.catalog.domain,"
-            + " org.mybatis.jpetstore.inventory.domain, org.mybatis.jpetstore.cart.domain,"
-            + " org.mybatis.jpetstore.order.domain");
+    factoryBean.setTypeAliasesPackage("org.mybatis.jpetstore.account.domain, org.mybatis.jpetstore.catalog.domain,"
+        + " org.mybatis.jpetstore.cart.domain, org.mybatis.jpetstore.order.domain");
     return factoryBean;
   }
 

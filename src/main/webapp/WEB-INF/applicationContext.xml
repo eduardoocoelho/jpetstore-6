@@ -40,8 +40,7 @@
 
     <!-- enable component scanning and autowire (beware that this does not enable mapper scanning!) -->
     <context:component-scan
-            base-package="org.mybatis.jpetstore.service,
-                          org.mybatis.jpetstore.account.application,
+            base-package="org.mybatis.jpetstore.account.application,
                           org.mybatis.jpetstore.catalog.application,
                           org.mybatis.jpetstore.inventory.application,
                           org.mybatis.jpetstore.cart.application,
@@ -55,18 +54,15 @@
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
         <property name="dataSource" ref="dataSource" />
         <property name="typeAliasesPackage"
-                  value="org.mybatis.jpetstore.domain,
-                         org.mybatis.jpetstore.account.domain,
+                  value="org.mybatis.jpetstore.account.domain,
                          org.mybatis.jpetstore.catalog.domain,
-                         org.mybatis.jpetstore.inventory.domain,
                          org.mybatis.jpetstore.cart.domain,
                          org.mybatis.jpetstore.order.domain" />
     </bean>
 
     <!-- scan for mappers and let them be autowired -->
     <mybatis:scan
-            base-package="org.mybatis.jpetstore.mapper,
-                          org.mybatis.jpetstore.account.persistence,
+            base-package="org.mybatis.jpetstore.account.persistence,
                           org.mybatis.jpetstore.catalog.persistence,
                           org.mybatis.jpetstore.inventory.persistence,
                           org.mybatis.jpetstore.order.persistence" />

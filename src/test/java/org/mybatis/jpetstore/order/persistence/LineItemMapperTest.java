@@ -23,8 +23,8 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mybatis.jpetstore.mapper.MapperTestContext;
 import org.mybatis.jpetstore.order.domain.LineItem;
+import org.mybatis.jpetstore.shared.persistence.MapperTestContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
