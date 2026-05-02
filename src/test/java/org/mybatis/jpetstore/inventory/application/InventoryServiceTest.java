@@ -16,6 +16,7 @@
 package org.mybatis.jpetstore.inventory.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,6 +29,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mybatis.jpetstore.inventory.api.InsufficientInventoryException;
 import org.mybatis.jpetstore.inventory.api.InventoryQueryService;
 import org.mybatis.jpetstore.inventory.api.InventoryReservationService;
 import org.mybatis.jpetstore.inventory.api.InventoryStatus;
@@ -110,12 +112,33 @@ class InventoryServiceTest {
     Map<String, Object> expectedParam = new HashMap<>(2);
     expectedParam.put("itemId", itemId);
     expectedParam.put("increment", quantity);
+    when(inventoryMapper.updateInventoryQuantity(expectedParam)).thenReturn(1);
 
     // when
     inventoryService.decrement(itemId, quantity);
 
     // then
     verify(inventoryMapper).updateInventoryQuantity(eq(expectedParam));
+  }
+
+  @Test
+  void shouldRejectDecrementWhenInventoryIsInsufficient() {
+    // given
+    String itemId = "EST-1";
+    int quantity = 4;
+    Map<String, Object> expectedParam = new HashMap<>(2);
+    expectedParam.put("itemId", itemId);
+    expectedParam.put("increment", quantity);
+    when(inventoryMapper.updateInventoryQuantity(expectedParam)).thenReturn(0);
+    when(inventoryMapper.getInventoryQuantity(itemId)).thenReturn(3);
+
+    // when and then
+    assertThatThrownBy(() -> inventoryService.decrement(itemId, quantity))
+        .isInstanceOfSatisfying(InsufficientInventoryException.class, exception -> {
+          assertThat(exception.getItemId()).isEqualTo(itemId);
+          assertThat(exception.getRequestedQuantity()).isEqualTo(quantity);
+          assertThat(exception.getAvailableQuantity()).isEqualTo(3);
+        }).hasMessage("Insufficient inventory for item EST-1: requested 4, available 3.");
   }
 
 }

@@ -27,6 +27,7 @@ import net.sourceforge.stripes.integration.spring.SpringBean;
 
 import org.mybatis.jpetstore.account.api.CustomerProfile;
 import org.mybatis.jpetstore.cart.api.CartSnapshot;
+import org.mybatis.jpetstore.inventory.api.InsufficientInventoryException;
 import org.mybatis.jpetstore.order.application.OrderFactory;
 import org.mybatis.jpetstore.order.application.OrderService;
 import org.mybatis.jpetstore.order.domain.Order;
@@ -153,7 +154,12 @@ public class OrderActionBean extends AbstractActionBean {
       return new ForwardResolution(CONFIRM_ORDER);
     } else if (getOrder() != null) {
 
-      orderService.insertOrder(order);
+      try {
+        orderService.insertOrder(order);
+      } catch (InsufficientInventoryException e) {
+        setMessage(e.getMessage());
+        return new ForwardResolution(ERROR);
+      }
 
       getSessionState().clearCart();
 

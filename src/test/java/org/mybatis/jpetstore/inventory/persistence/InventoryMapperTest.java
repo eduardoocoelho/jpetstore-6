@@ -61,11 +61,29 @@ class InventoryMapperTest {
     params.put("increment", 10);
 
     // when
-    mapper.updateInventoryQuantity(params);
+    int updatedRows = mapper.updateInventoryQuantity(params);
 
     // then
+    assertThat(updatedRows).isEqualTo(1);
     Integer quantity = jdbcTemplate.queryForObject("SELECT QTY FROM inventory WHERE itemid = ?", Integer.class, itemId);
     assertThat(quantity).isEqualTo(9990);
+  }
+
+  @Test
+  void updateInventoryQuantityDoesNotDecrementWhenQuantityIsInsufficient() {
+    // given
+    String itemId = "EST-1";
+    Map<String, Object> params = new HashMap<>();
+    params.put("itemId", itemId);
+    params.put("increment", 10001);
+
+    // when
+    int updatedRows = mapper.updateInventoryQuantity(params);
+
+    // then
+    assertThat(updatedRows).isZero();
+    Integer quantity = jdbcTemplate.queryForObject("SELECT QTY FROM inventory WHERE itemid = ?", Integer.class, itemId);
+    assertThat(quantity).isEqualTo(10000);
   }
 
 }

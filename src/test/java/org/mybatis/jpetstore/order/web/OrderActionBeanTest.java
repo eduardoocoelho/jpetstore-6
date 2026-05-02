@@ -38,6 +38,7 @@ import org.mybatis.jpetstore.account.web.AccountActionBean;
 import org.mybatis.jpetstore.cart.domain.Cart;
 import org.mybatis.jpetstore.cart.web.CartActionBean;
 import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
+import org.mybatis.jpetstore.inventory.api.InsufficientInventoryException;
 import org.mybatis.jpetstore.order.application.OrderFactory;
 import org.mybatis.jpetstore.order.application.OrderService;
 import org.mybatis.jpetstore.order.domain.Order;
@@ -174,6 +175,27 @@ class OrderActionBeanTest {
     assertThat(cartBean.getCart().getNumberOfItems()).isZero();
     assertThat(context.getMessages()).extracting(message -> message.getMessage(Locale.getDefault()))
         .containsExactly("Thank you, your order has been submitted.");
+  }
+
+  @Test
+  void confirmedNewOrderTranslatesInsufficientInventoryToErrorFlow() {
+    OrderActionBean orderActionBean = new OrderActionBean();
+    OrderService orderService = mock(OrderService.class);
+    ActionBeanContext context = contextWithRequestAndMessages();
+    Order order = new Order();
+
+    ReflectionTestUtils.setField(orderActionBean, "orderService", orderService);
+    orderActionBean.setContext(context);
+    orderActionBean.setOrder(order);
+    orderActionBean.setConfirmed(true);
+    org.mockito.Mockito.doThrow(new InsufficientInventoryException("EST-1", 4, 3)).when(orderService)
+        .insertOrder(order);
+
+    Resolution resolution = orderActionBean.newOrder();
+
+    assertThat(resolution.toString()).contains("Error.jsp");
+    assertThat(context.getMessages()).extracting(message -> message.getMessage(Locale.getDefault()))
+        .containsExactly("Insufficient inventory for item EST-1: requested 4, available 3.");
   }
 
   @Test

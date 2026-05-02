@@ -18,6 +18,7 @@ package org.mybatis.jpetstore.inventory.application;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.mybatis.jpetstore.inventory.api.InsufficientInventoryException;
 import org.mybatis.jpetstore.inventory.api.InventoryQueryService;
 import org.mybatis.jpetstore.inventory.api.InventoryReservationService;
 import org.mybatis.jpetstore.inventory.api.InventoryStatus;
@@ -54,7 +55,10 @@ public class InventoryService implements InventoryQueryService, InventoryReserva
     Map<String, Object> param = new HashMap<>(2);
     param.put("itemId", itemId);
     param.put("increment", quantity);
-    inventoryMapper.updateInventoryQuantity(param);
+    int updatedRows = inventoryMapper.updateInventoryQuantity(param);
+    if (updatedRows == 0) {
+      throw new InsufficientInventoryException(itemId, quantity, getQuantity(itemId));
+    }
   }
 
 }
