@@ -15,16 +15,28 @@
  */
 package org.mybatis.jpetstore.shared.web;
 
-public interface SessionAccount {
+import java.math.BigDecimal;
 
-  boolean isAuthenticated();
+public class CartSummaryView {
 
-  String getCurrentUsername();
+  private final int numberOfItems;
+  private final BigDecimal subTotal;
 
-  Object getCurrentCustomerProfile();
+  public CartSummaryView(int numberOfItems, BigDecimal subTotal) {
+    this.numberOfItems = numberOfItems;
+    this.subTotal = subTotal == null ? BigDecimal.ZERO : subTotal;
+  }
 
-  default AccountSessionView getCurrentAccountView() {
-    return AccountSessionView.anonymous();
+  public static CartSummaryView empty() {
+    return new CartSummaryView(0, BigDecimal.ZERO);
+  }
+
+  public int getNumberOfItems() {
+    return numberOfItems;
+  }
+
+  public BigDecimal getSubTotal() {
+    return subTotal;
   }
 
 }

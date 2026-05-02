@@ -33,6 +33,7 @@ import org.mybatis.jpetstore.cart.domain.Cart;
 import org.mybatis.jpetstore.cart.domain.CartItem;
 import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
 import org.mybatis.jpetstore.shared.web.AbstractActionBean;
+import org.mybatis.jpetstore.shared.web.CartSummaryView;
 import org.mybatis.jpetstore.shared.web.SessionCart;
 
 /**
@@ -144,6 +145,11 @@ public class CartActionBean extends AbstractActionBean implements SessionCart {
   @Override
   public CartSnapshot getCurrentCartSnapshot() {
     return cart == null ? null : CART_QUERY_SERVICE.getCartSnapshot(cart);
+  }
+
+  @Override
+  public CartSummaryView getCurrentCartView() {
+    return cart == null ? CartSummaryView.empty() : new CartSummaryView(cart.getNumberOfItems(), cart.getSubTotal());
   }
 
   @Override

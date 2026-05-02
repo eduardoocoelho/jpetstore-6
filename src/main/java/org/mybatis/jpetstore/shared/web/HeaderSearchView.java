@@ -15,16 +15,20 @@
  */
 package org.mybatis.jpetstore.shared.web;
 
-public interface SessionAccount {
+public class HeaderSearchView {
 
-  boolean isAuthenticated();
+  private final String keyword;
 
-  String getCurrentUsername();
+  public HeaderSearchView(String keyword) {
+    this.keyword = keyword;
+  }
 
-  Object getCurrentCustomerProfile();
+  public static HeaderSearchView empty() {
+    return new HeaderSearchView(null);
+  }
 
-  default AccountSessionView getCurrentAccountView() {
-    return AccountSessionView.anonymous();
+  public String getKeyword() {
+    return keyword;
   }
 
 }

@@ -19,6 +19,10 @@ public interface SessionCart {
 
   Object getCurrentCartSnapshot();
 
+  default CartSummaryView getCurrentCartView() {
+    return CartSummaryView.empty();
+  }
+
   void clearCart();
 
 }

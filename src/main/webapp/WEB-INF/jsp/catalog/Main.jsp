@@ -18,11 +18,8 @@
 <%@ include file="../common/IncludeTop.jsp"%>
 
 <div id="Welcome">
-<div id="WelcomeContent"><c:if
-	test="${sessionScope.accountBean != null }">
-	<c:if test="${sessionScope.accountBean.authenticated}">
-        Welcome ${sessionScope.accountBean.account.firstName}!
-      </c:if>
+<div id="WelcomeContent"><c:if test="${actionBean.pageView.authenticated}">
+    Welcome ${actionBean.pageView.authenticatedUser.displayName}!
 </c:if></div>
 </div>
 
@@ -89,4 +86,3 @@ Exotic Varieties</div>
 </div>
 
 <%@ include file="../common/IncludeBottom.jsp"%>
-

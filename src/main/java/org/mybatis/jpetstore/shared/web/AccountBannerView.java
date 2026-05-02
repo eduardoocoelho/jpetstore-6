@@ -15,16 +15,26 @@
  */
 package org.mybatis.jpetstore.shared.web;
 
-public interface SessionAccount {
+public class AccountBannerView {
 
-  boolean isAuthenticated();
+  private final boolean enabled;
+  private final String name;
 
-  String getCurrentUsername();
+  public AccountBannerView(boolean enabled, String name) {
+    this.enabled = enabled;
+    this.name = name;
+  }
 
-  Object getCurrentCustomerProfile();
+  public static AccountBannerView disabled() {
+    return new AccountBannerView(false, null);
+  }
 
-  default AccountSessionView getCurrentAccountView() {
-    return AccountSessionView.anonymous();
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  public String getName() {
+    return name;
   }
 
 }

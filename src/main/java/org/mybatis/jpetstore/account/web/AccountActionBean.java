@@ -38,6 +38,10 @@ import org.mybatis.jpetstore.catalog.api.CatalogQueryService;
 import org.mybatis.jpetstore.catalog.api.ProductSummary;
 import org.mybatis.jpetstore.catalog.web.CatalogActionBean;
 import org.mybatis.jpetstore.shared.web.AbstractActionBean;
+import org.mybatis.jpetstore.shared.web.AccountBannerView;
+import org.mybatis.jpetstore.shared.web.AccountFavoriteListView;
+import org.mybatis.jpetstore.shared.web.AccountSessionView;
+import org.mybatis.jpetstore.shared.web.AuthenticatedUserView;
 import org.mybatis.jpetstore.shared.web.SessionAccount;
 
 /**
@@ -218,6 +222,18 @@ public class AccountActionBean extends AbstractActionBean implements SessionAcco
     return new CustomerProfile(account.getUsername(), account.getEmail(), account.getFirstName(), account.getLastName(),
         account.getAddress1(), account.getAddress2(), account.getCity(), account.getState(), account.getZip(),
         account.getCountry(), account.getPhone(), account.getFavouriteCategoryId(), account.getLanguagePreference());
+  }
+
+  @Override
+  public AccountSessionView getCurrentAccountView() {
+    if (account == null) {
+      return AccountSessionView.anonymous();
+    }
+    boolean currentlyAuthenticated = isAuthenticated();
+    return new AccountSessionView(
+        new AuthenticatedUserView(currentlyAuthenticated, account.getUsername(), account.getFirstName()),
+        new AccountBannerView(currentlyAuthenticated && account.isBannerOption(), account.getBannerName()),
+        new AccountFavoriteListView(!currentlyAuthenticated && account.isListOption(), myList));
   }
 
   /**

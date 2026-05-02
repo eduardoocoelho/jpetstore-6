@@ -20,6 +20,7 @@
 	uri="http://stripes.sourceforge.net/stripes.tld"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<c:set var="pageView" value="${actionBean.pageView}" />
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -59,34 +60,24 @@
 	event="viewCart">
 	<img align="middle" name="img_cart" src="../images/cart.gif" />
 </stripes:link> <img align="middle" src="../images/separator.gif" /> <c:if
-	test="${sessionScope.accountBean == null}">
+	test="${!pageView.authenticated}">
 	<stripes:link
 		beanclass="org.mybatis.jpetstore.account.web.AccountActionBean"
 		event="signonForm">
           Sign In
 	    </stripes:link>
-</c:if> <c:if test="${sessionScope.accountBean != null}">
-	<c:if test="${!sessionScope.accountBean.authenticated}">
-		<stripes:link
-			beanclass="org.mybatis.jpetstore.account.web.AccountActionBean"
-			event="signonForm">
-            Sign In
-	      </stripes:link>
-	</c:if>
-</c:if> <c:if test="${sessionScope.accountBean != null}">
-	<c:if test="${sessionScope.accountBean.authenticated}">
-		<stripes:link
-			beanclass="org.mybatis.jpetstore.account.web.AccountActionBean"
-			event="signoff">
+</c:if> <c:if test="${pageView.authenticated}">
+	<stripes:link
+		beanclass="org.mybatis.jpetstore.account.web.AccountActionBean"
+		event="signoff">
             Sign Out
 	      </stripes:link>
-		<img align="middle" src="../images/separator.gif" />
-		<stripes:link
-			beanclass="org.mybatis.jpetstore.account.web.AccountActionBean"
-			event="editAccountForm">
+	<img align="middle" src="../images/separator.gif" />
+	<stripes:link
+		beanclass="org.mybatis.jpetstore.account.web.AccountActionBean"
+		event="editAccountForm">
             My Account
 	      </stripes:link>
-	</c:if>
 </c:if> <img align="middle" src="../images/separator.gif" /> <a
 	href="../help.html">?</a></div>
 </div>

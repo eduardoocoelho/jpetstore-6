@@ -15,16 +15,29 @@
  */
 package org.mybatis.jpetstore.shared.web;
 
-public interface SessionAccount {
+import java.util.Collections;
+import java.util.List;
 
-  boolean isAuthenticated();
+public class AccountFavoriteListView {
 
-  String getCurrentUsername();
+  private final boolean enabled;
+  private final List<?> products;
 
-  Object getCurrentCustomerProfile();
+  public AccountFavoriteListView(boolean enabled, List<?> products) {
+    this.enabled = enabled;
+    this.products = products == null ? Collections.emptyList() : List.copyOf(products);
+  }
 
-  default AccountSessionView getCurrentAccountView() {
-    return AccountSessionView.anonymous();
+  public static AccountFavoriteListView disabled() {
+    return new AccountFavoriteListView(false, Collections.emptyList());
+  }
+
+  public boolean isEnabled() {
+    return enabled;
+  }
+
+  public List<?> getProducts() {
+    return products;
   }
 
 }

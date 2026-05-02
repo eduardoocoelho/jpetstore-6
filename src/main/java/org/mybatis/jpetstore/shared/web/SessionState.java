@@ -55,6 +55,20 @@ public class SessionState {
     return type.cast(cart.getCurrentCartSnapshot());
   }
 
+  public SharedPageView getPageView() {
+    return new SharedPageView(getAccountView(), HeaderSearchView.empty(), getCartView());
+  }
+
+  public AccountSessionView getAccountView() {
+    SessionAccount account = getAccount();
+    return account == null ? AccountSessionView.anonymous() : account.getCurrentAccountView();
+  }
+
+  public CartSummaryView getCartView() {
+    SessionCart cart = getCart();
+    return cart == null ? CartSummaryView.empty() : cart.getCurrentCartView();
+  }
+
   public void clearCart() {
     SessionCart cart = getCart();
     if (cart != null) {

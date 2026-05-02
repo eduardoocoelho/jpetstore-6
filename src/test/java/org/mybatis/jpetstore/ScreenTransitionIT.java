@@ -1,5 +1,5 @@
 /*
- *    Copyright 2010-2022 the original author or authors.
+ *    Copyright 2010-2026 the original author or authors.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import static com.codeborne.selenide.CollectionCondition.size;
 import static com.codeborne.selenide.Condition.empty;
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.value;
+import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Configuration.baseUrl;
 import static com.codeborne.selenide.Configuration.browser;
 import static com.codeborne.selenide.Configuration.headless;
@@ -78,6 +79,8 @@ class ScreenTransitionIT {
     // Move to the top page
     $(By.linkText("Enter the Store")).click();
     $(By.id("WelcomeContent")).shouldBe(empty);
+    $(By.linkText("Sign In")).shouldBe(visible);
+    $(By.id("Banner")).shouldBe(empty);
 
     // Move to sign in page & sign
     $(By.linkText("Sign In")).click();
@@ -85,6 +88,9 @@ class ScreenTransitionIT {
     $(By.name("password")).setValue("j2ee");
     $(By.name("signon")).click();
     $(By.id("WelcomeContent")).shouldBe(text("Welcome ABC!"));
+    $(By.linkText("Sign Out")).shouldBe(visible);
+    $(By.linkText("My Account")).shouldBe(visible);
+    assertThat($(By.id("Banner")).innerHtml()).contains("banner_dogs.gif");
 
     // Search items
     $(By.name("keyword")).setValue("fish");

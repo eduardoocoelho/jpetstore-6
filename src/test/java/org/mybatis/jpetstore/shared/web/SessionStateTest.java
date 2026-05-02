@@ -20,6 +20,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
@@ -70,6 +71,56 @@ class SessionStateTest {
     assertThat(customerProfile.phone()).isEqualTo("555-0100");
     assertThat(customerProfile.favouriteCategoryId()).isEqualTo("DOGS");
     assertThat(customerProfile.languagePreference()).isEqualTo("english");
+  }
+
+  @Test
+  void shouldBuildAnonymousSharedPageViewWhenSessionIsEmpty() {
+    HttpSession session = mock(HttpSession.class);
+    SessionState sessionState = new SessionState(session);
+
+    SharedPageView pageView = sessionState.getPageView();
+
+    assertThat(pageView.isAuthenticated()).isFalse();
+    assertThat(pageView.getAuthenticatedUser().getUsername()).isNull();
+    assertThat(pageView.getAccountBanner().isEnabled()).isFalse();
+    assertThat(pageView.getAccountFavoriteList().isEnabled()).isFalse();
+    assertThat(pageView.getAccountFavoriteList().getProducts()).isEmpty();
+    assertThat(pageView.getCartSummary().getNumberOfItems()).isZero();
+    assertThat(pageView.getCartSummary().getSubTotal()).isEqualTo(BigDecimal.ZERO);
+  }
+
+  @Test
+  void shouldBuildSharedPageViewFromSessionAccountAndCart() {
+    HttpSession session = mock(HttpSession.class);
+    AccountActionBean accountBean = authenticatedAccountBean();
+    CartActionBean cartBean = cartActionBeanWithItem();
+    when(session.getAttribute(SessionState.ACCOUNT_ACTION_SESSION_KEY)).thenReturn(accountBean);
+    when(session.getAttribute(SessionState.CART_ACTION_SESSION_KEY)).thenReturn(cartBean);
+    SessionState sessionState = new SessionState(session);
+
+    SharedPageView pageView = sessionState.getPageView();
+
+    assertThat(pageView.isAuthenticated()).isTrue();
+    assertThat(pageView.getAuthenticatedUser().getUsername()).isEqualTo("j2ee");
+    assertThat(pageView.getAuthenticatedUser().getDisplayName()).isEqualTo("Jane");
+    assertThat(pageView.getAccountBanner().isEnabled()).isTrue();
+    assertThat(pageView.getAccountBanner().getName()).isEqualTo("<img src=\"../images/banner_dogs.gif\">");
+    assertThat(pageView.getCartSummary().getNumberOfItems()).isEqualTo(1);
+    assertThat(pageView.getCartSummary().getSubTotal()).isEqualTo(new BigDecimal("33.00"));
+  }
+
+  @Test
+  void shouldExposeFavoriteListViewWithoutLeakingAccountBeanToJsp() {
+    HttpSession session = mock(HttpSession.class);
+    AccountActionBean accountBean = unauthenticatedAccountBeanWithFavoriteList();
+    when(session.getAttribute(SessionState.ACCOUNT_ACTION_SESSION_KEY)).thenReturn(accountBean);
+    SessionState sessionState = new SessionState(session);
+
+    AccountFavoriteListView favoriteList = sessionState.getPageView().getAccountFavoriteList();
+
+    assertThat(favoriteList.isEnabled()).isTrue();
+    assertThat(favoriteList.getProducts()).hasSize(1);
+    assertThat(favoriteList.getProducts().get(0)).isInstanceOf(ProductSummary.class);
   }
 
   @Test
@@ -137,10 +188,25 @@ class SessionStateTest {
     account.setPhone("555-0100");
     account.setFavouriteCategoryId("DOGS");
     account.setLanguagePreference("english");
+    account.setBannerOption(true);
+    account.setBannerName("<img src=\"../images/banner_dogs.gif\">");
 
     AccountActionBean accountBean = new AccountActionBean();
     ReflectionTestUtils.setField(accountBean, "account", account);
     ReflectionTestUtils.setField(accountBean, "authenticated", true);
+    return accountBean;
+  }
+
+  private static AccountActionBean unauthenticatedAccountBeanWithFavoriteList() {
+    Account account = new Account();
+    account.setUsername("j2ee");
+    account.setListOption(true);
+
+    AccountActionBean accountBean = new AccountActionBean();
+    ReflectionTestUtils.setField(accountBean, "account", account);
+    ReflectionTestUtils.setField(accountBean, "authenticated", false);
+    ReflectionTestUtils.setField(accountBean, "myList",
+        List.of(new ProductSummary("K9-BD-01", "DOGS", "Bulldog", "Friendly")));
     return accountBean;
   }
 

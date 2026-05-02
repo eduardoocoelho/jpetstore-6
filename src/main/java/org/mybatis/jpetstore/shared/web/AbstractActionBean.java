@@ -48,4 +48,11 @@ public abstract class AbstractActionBean implements ActionBean, Serializable {
     this.context = context;
   }
 
+  public SharedPageView getPageView() {
+    if (context == null || context.getRequest() == null) {
+      return SharedPageView.anonymous();
+    }
+    return new SessionState(context.getRequest().getSession()).getPageView();
+  }
+
 }

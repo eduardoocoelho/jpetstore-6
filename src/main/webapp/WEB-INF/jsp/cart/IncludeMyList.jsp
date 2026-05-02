@@ -15,11 +15,11 @@
        limitations under the License.
 
 --%>
-<c:if test="${!empty accountBean.myList}">
+<c:if test="${!empty actionBean.pageView.accountFavoriteList.products}">
 	<p>Pet Favorites <br />
 	Shop for more of your favorite pets here.</p>
 	<ul>
-		<c:forEach var="product" items="${accountBean.myList}">
+		<c:forEach var="product" items="${actionBean.pageView.accountFavoriteList.products}">
 			<li><stripes:link
 				beanclass="org.mybatis.jpetstore.catalog.web.CatalogActionBean"
 				event="viewProduct">
