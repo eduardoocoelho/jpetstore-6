@@ -39,7 +39,6 @@ public class Item implements Serializable {
   private String attribute4;
   private String attribute5;
   private Product product;
-  private int quantity;
 
   public String getItemId() {
     return itemId;
@@ -47,14 +46,6 @@ public class Item implements Serializable {
 
   public void setItemId(String itemId) {
     this.itemId = itemId.trim();
-  }
-
-  public int getQuantity() {
-    return quantity;
-  }
-
-  public void setQuantity(int quantity) {
-    this.quantity = quantity;
   }
 
   public Product getProduct() {

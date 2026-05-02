@@ -21,6 +21,6 @@ public interface InventoryMapper {
 
   int getInventoryQuantity(String itemId);
 
-  void updateInventoryQuantity(Map<String, Object> param);
+  int updateInventoryQuantity(Map<String, Object> param);
 
 }

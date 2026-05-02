@@ -17,7 +17,12 @@ package org.mybatis.jpetstore.order.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.lang.reflect.Executable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -42,6 +47,47 @@ class OrderTest {
     order.setOrderDate(orderDate);
 
     assertThat(order.getOrderDate()).isSameAs(orderDate);
+  }
+
+  @Test
+  void shouldNotExposeAccountOrCartDomainTypes() {
+    List<String> references = new ArrayList<>();
+
+    collectForbiddenReferences(references, Order.class);
+    collectForbiddenReferences(references, LineItem.class);
+
+    assertThat(references).isEmpty();
+  }
+
+  private static void collectForbiddenReferences(List<String> references, Class<?> type) {
+    for (Field field : type.getDeclaredFields()) {
+      addIfForbidden(references, type.getSimpleName() + "." + field.getName(), field.getType());
+    }
+    for (Method method : type.getDeclaredMethods()) {
+      addIfForbidden(references, type.getSimpleName() + "." + method.getName() + " return", method.getReturnType());
+      collectExecutableReferences(references, type.getSimpleName() + "." + method.getName(), method);
+    }
+    for (Executable constructor : type.getDeclaredConstructors()) {
+      collectExecutableReferences(references, type.getSimpleName() + " constructor", constructor);
+    }
+  }
+
+  private static void collectExecutableReferences(List<String> references, String memberName, Executable executable) {
+    for (Class<?> parameterType : executable.getParameterTypes()) {
+      addIfForbidden(references, memberName + " parameter", parameterType);
+    }
+  }
+
+  private static void addIfForbidden(List<String> references, String memberName, Class<?> type) {
+    if (isForbiddenDomainType(type)) {
+      references.add(memberName + " references " + type.getName());
+    }
+  }
+
+  private static boolean isForbiddenDomainType(Class<?> type) {
+    String name = type.getName();
+    return name.startsWith("org.mybatis.jpetstore.account.domain.")
+        || name.startsWith("org.mybatis.jpetstore.cart.domain.");
   }
 
 }

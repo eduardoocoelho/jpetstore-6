@@ -29,6 +29,7 @@ import net.sourceforge.stripes.action.SessionScope;
 import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.integration.spring.SpringBean;
 import net.sourceforge.stripes.validation.Validate;
+import net.sourceforge.stripes.validation.ValidateNestedProperties;
 
 import org.mybatis.jpetstore.account.api.CustomerProfile;
 import org.mybatis.jpetstore.account.application.AccountService;
@@ -62,6 +63,8 @@ public class AccountActionBean extends AbstractActionBean implements SessionAcco
   @SpringBean
   private transient CatalogQueryService catalogQueryService;
 
+  @ValidateNestedProperties({ @Validate(field = "firstName", required = true, on = { "newAccount", "editAccount" }),
+      @Validate(field = "lastName", required = true, on = { "newAccount", "editAccount" }) })
   private Account account = new Account();
   private List<ProductSummary> myList;
   private boolean authenticated;

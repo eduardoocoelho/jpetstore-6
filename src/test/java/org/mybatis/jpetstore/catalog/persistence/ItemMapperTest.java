@@ -26,6 +26,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mybatis.jpetstore.catalog.domain.Item;
 import org.mybatis.jpetstore.shared.persistence.MapperTestContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +38,9 @@ class ItemMapperTest {
 
   @Autowired
   private ItemMapper mapper;
+
+  @Autowired
+  private JdbcTemplate jdbcTemplate;
 
   @Test
   void getItemListByProduct() {
@@ -105,6 +109,21 @@ class ItemMapperTest {
     assertThat(item.getProduct().getDescription())
         .isEqualTo("<image src=\"../images/fish1.gif\">Salt Water fish from Australia");
     assertThat(item.getProduct().getCategoryId()).isEqualTo("FISH");
+  }
+
+  @Test
+  void getItemDoesNotRequireInventoryRow() {
+    // given
+    String itemId = "EST-2";
+    jdbcTemplate.update("DELETE FROM inventory WHERE itemid = ?", itemId);
+
+    // when
+    Item item = mapper.getItem(itemId);
+
+    // then
+    assertThat(item).isNotNull();
+    assertThat(item.getItemId()).isEqualTo(itemId);
+    assertThat(item.getProduct().getProductId()).isEqualTo("FI-SW-01");
   }
 
 }

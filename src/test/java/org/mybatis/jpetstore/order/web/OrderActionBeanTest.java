@@ -31,9 +31,6 @@ import javax.servlet.http.HttpSession;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.Message;
 import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.config.Configuration;
-import net.sourceforge.stripes.controller.ActionResolver;
-import net.sourceforge.stripes.controller.StripesFilter;
 
 import org.junit.jupiter.api.Test;
 import org.mybatis.jpetstore.account.domain.Account;
@@ -41,6 +38,7 @@ import org.mybatis.jpetstore.account.web.AccountActionBean;
 import org.mybatis.jpetstore.cart.domain.Cart;
 import org.mybatis.jpetstore.cart.web.CartActionBean;
 import org.mybatis.jpetstore.catalog.api.ItemSnapshot;
+import org.mybatis.jpetstore.inventory.api.InsufficientInventoryException;
 import org.mybatis.jpetstore.order.application.OrderFactory;
 import org.mybatis.jpetstore.order.application.OrderService;
 import org.mybatis.jpetstore.order.domain.Order;
@@ -147,11 +145,10 @@ class OrderActionBeanTest {
 
     orderActionBean.setContext(context);
     when(session.getAttribute("/actions/Account.action")).thenReturn(accountBean);
-    configureStripesActionResolver();
 
     Resolution resolution = orderActionBean.newOrderForm();
 
-    assertThat(resolution.toString()).contains("Account.action");
+    assertThat(resolution.toString()).contains("SignonForm.jsp");
     assertThat(context.getMessages()).extracting(message -> message.getMessage(Locale.getDefault())).containsExactly(
         "You must sign on before attempting to check out.  Please sign on and try checking out again.");
   }
@@ -181,6 +178,27 @@ class OrderActionBeanTest {
   }
 
   @Test
+  void confirmedNewOrderTranslatesInsufficientInventoryToErrorFlow() {
+    OrderActionBean orderActionBean = new OrderActionBean();
+    OrderService orderService = mock(OrderService.class);
+    ActionBeanContext context = contextWithRequestAndMessages();
+    Order order = new Order();
+
+    ReflectionTestUtils.setField(orderActionBean, "orderService", orderService);
+    orderActionBean.setContext(context);
+    orderActionBean.setOrder(order);
+    orderActionBean.setConfirmed(true);
+    org.mockito.Mockito.doThrow(new InsufficientInventoryException("EST-1", 4, 3)).when(orderService)
+        .insertOrder(order);
+
+    Resolution resolution = orderActionBean.newOrder();
+
+    assertThat(resolution.toString()).contains("Error.jsp");
+    assertThat(context.getMessages()).extracting(message -> message.getMessage(Locale.getDefault()))
+        .containsExactly("Insufficient inventory for item EST-1: requested 4, available 3.");
+  }
+
+  @Test
   void viewOrderRejectsOrderOwnedByAnotherUser() {
     OrderActionBean orderActionBean = new OrderActionBean();
     OrderService orderService = mock(OrderService.class);
@@ -202,17 +220,6 @@ class OrderActionBeanTest {
     assertThat(orderActionBean.getOrder()).isNull();
     assertThat(context.getMessages()).extracting(message -> message.getMessage(Locale.getDefault()))
         .containsExactly("You may only view your own orders.");
-  }
-
-  @SuppressWarnings("unchecked")
-  private static void configureStripesActionResolver() {
-    Configuration configuration = mock(Configuration.class);
-    ActionResolver actionResolver = mock(ActionResolver.class);
-    ThreadLocal<Configuration> configurationStash = (ThreadLocal<Configuration>) ReflectionTestUtils
-        .getField(StripesFilter.class, "configurationStash");
-    when(configuration.getActionResolver()).thenReturn(actionResolver);
-    when(actionResolver.getUrlBinding(AccountActionBean.class)).thenReturn("/actions/Account.action");
-    configurationStash.set(configuration);
   }
 
   private static HttpSession sessionFor(OrderActionBean orderActionBean) {

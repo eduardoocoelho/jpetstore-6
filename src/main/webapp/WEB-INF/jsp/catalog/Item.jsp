@@ -43,10 +43,10 @@
 		<td>${actionBean.product.name}</td>
 	</tr>
 	<tr>
-		<td><c:if test="${actionBean.item.quantity <= 0}">
+		<td><c:if test="${!actionBean.inventoryStatus.inStock}">
         Back ordered.
-      </c:if> <c:if test="${actionBean.item.quantity > 0}">
-      	${actionBean.item.quantity} in stock.
+      </c:if> <c:if test="${actionBean.inventoryStatus.inStock}">
+      	${actionBean.inventoryStatus.quantity} in stock.
 	  </c:if></td>
 	</tr>
 	<tr>
@@ -67,5 +67,4 @@
 </div>
 
 <%@ include file="../common/IncludeBottom.jsp"%>
-
 

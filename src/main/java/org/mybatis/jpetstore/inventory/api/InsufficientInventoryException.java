@@ -15,17 +15,31 @@
  */
 package org.mybatis.jpetstore.inventory.api;
 
-public record InventoryStatus(String itemId, int quantity, boolean inStock) {
+public class InsufficientInventoryException extends RuntimeException {
+
+  private static final long serialVersionUID = 1325893048140792295L;
+
+  private final String itemId;
+  private final int requestedQuantity;
+  private final int availableQuantity;
+
+  public InsufficientInventoryException(String itemId, int requestedQuantity, int availableQuantity) {
+    super("Insufficient inventory for item " + itemId + ": requested " + requestedQuantity + ", available "
+        + availableQuantity + ".");
+    this.itemId = itemId;
+    this.requestedQuantity = requestedQuantity;
+    this.availableQuantity = availableQuantity;
+  }
 
   public String getItemId() {
     return itemId;
   }
 
-  public int getQuantity() {
-    return quantity;
+  public int getRequestedQuantity() {
+    return requestedQuantity;
   }
 
-  public boolean isInStock() {
-    return inStock;
+  public int getAvailableQuantity() {
+    return availableQuantity;
   }
 }
