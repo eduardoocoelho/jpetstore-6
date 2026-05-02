@@ -31,9 +31,6 @@ import javax.servlet.http.HttpSession;
 import net.sourceforge.stripes.action.ActionBeanContext;
 import net.sourceforge.stripes.action.Message;
 import net.sourceforge.stripes.action.Resolution;
-import net.sourceforge.stripes.config.Configuration;
-import net.sourceforge.stripes.controller.ActionResolver;
-import net.sourceforge.stripes.controller.StripesFilter;
 
 import org.junit.jupiter.api.Test;
 import org.mybatis.jpetstore.account.domain.Account;
@@ -147,11 +144,10 @@ class OrderActionBeanTest {
 
     orderActionBean.setContext(context);
     when(session.getAttribute("/actions/Account.action")).thenReturn(accountBean);
-    configureStripesActionResolver();
 
     Resolution resolution = orderActionBean.newOrderForm();
 
-    assertThat(resolution.toString()).contains("Account.action");
+    assertThat(resolution.toString()).contains("SignonForm.jsp");
     assertThat(context.getMessages()).extracting(message -> message.getMessage(Locale.getDefault())).containsExactly(
         "You must sign on before attempting to check out.  Please sign on and try checking out again.");
   }
@@ -202,17 +198,6 @@ class OrderActionBeanTest {
     assertThat(orderActionBean.getOrder()).isNull();
     assertThat(context.getMessages()).extracting(message -> message.getMessage(Locale.getDefault()))
         .containsExactly("You may only view your own orders.");
-  }
-
-  @SuppressWarnings("unchecked")
-  private static void configureStripesActionResolver() {
-    Configuration configuration = mock(Configuration.class);
-    ActionResolver actionResolver = mock(ActionResolver.class);
-    ThreadLocal<Configuration> configurationStash = (ThreadLocal<Configuration>) ReflectionTestUtils
-        .getField(StripesFilter.class, "configurationStash");
-    when(configuration.getActionResolver()).thenReturn(actionResolver);
-    when(actionResolver.getUrlBinding(AccountActionBean.class)).thenReturn("/actions/Account.action");
-    configurationStash.set(configuration);
   }
 
   private static HttpSession sessionFor(OrderActionBean orderActionBean) {

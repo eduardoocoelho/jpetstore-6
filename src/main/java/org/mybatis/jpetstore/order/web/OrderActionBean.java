@@ -26,7 +26,6 @@ import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.integration.spring.SpringBean;
 
 import org.mybatis.jpetstore.account.api.CustomerProfile;
-import org.mybatis.jpetstore.account.web.AccountActionBean;
 import org.mybatis.jpetstore.cart.api.CartSnapshot;
 import org.mybatis.jpetstore.order.application.OrderFactory;
 import org.mybatis.jpetstore.order.application.OrderService;
@@ -47,6 +46,7 @@ public class OrderActionBean extends AbstractActionBean {
 
   private static final String CONFIRM_ORDER = "/WEB-INF/jsp/order/ConfirmOrder.jsp";
   private static final String LIST_ORDERS = "/WEB-INF/jsp/order/ListOrders.jsp";
+  private static final String SIGNON = "/WEB-INF/jsp/account/SignonForm.jsp";
   private static final String NEW_ORDER = "/WEB-INF/jsp/order/NewOrderForm.jsp";
   private static final String SHIPPING = "/WEB-INF/jsp/order/ShippingForm.jsp";
   private static final String VIEW_ORDER = "/WEB-INF/jsp/order/ViewOrder.jsp";
@@ -130,7 +130,7 @@ public class OrderActionBean extends AbstractActionBean {
     clear();
     if (!sessionState.isAuthenticated()) {
       setMessage("You must sign on before attempting to check out.  Please sign on and try checking out again.");
-      return new ForwardResolution(AccountActionBean.class);
+      return new ForwardResolution(SIGNON);
     } else if (cart != null) {
       order = orderFactory.createOrder(customer, cart);
       return new ForwardResolution(NEW_ORDER);
