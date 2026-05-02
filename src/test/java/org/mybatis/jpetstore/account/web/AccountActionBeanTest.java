@@ -42,6 +42,7 @@ import org.mybatis.jpetstore.account.application.AccountService;
 import org.mybatis.jpetstore.account.domain.Account;
 import org.mybatis.jpetstore.catalog.api.CatalogQueryService;
 import org.mybatis.jpetstore.catalog.api.ProductSummary;
+import org.mybatis.jpetstore.catalog.domain.Category;
 import org.mybatis.jpetstore.catalog.web.CatalogActionBean;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -170,6 +171,19 @@ class AccountActionBeanTest {
   }
 
   @Test
+  void getCategoriesUsesCatalogCategoryList() {
+    AccountActionBean accountActionBean = new AccountActionBean();
+    CatalogQueryService catalogQueryService = mock(CatalogQueryService.class);
+    ReflectionTestUtils.setField(accountActionBean, "catalogQueryService", catalogQueryService);
+    when(catalogQueryService.getCategoryList()).thenReturn(
+        List.of(category("FISH"), category("DOGS"), category("REPTILES"), category("CATS"), category("BIRDS")));
+
+    List<String> categories = accountActionBean.getCategories();
+
+    assertThat(categories).containsExactly("FISH", "DOGS", "REPTILES", "CATS", "BIRDS");
+  }
+
+  @Test
   void signonLoadsAccountFavoriteCategoryProductListAndRegistersSessionAlias() {
     AccountActionBean accountActionBean = new AccountActionBean();
     AccountService accountService = mock(AccountService.class);
@@ -238,5 +252,11 @@ class AccountActionBeanTest {
     when(configuration.getActionResolver()).thenReturn(actionResolver);
     when(actionResolver.getUrlBinding(CatalogActionBean.class)).thenReturn("/actions/Catalog.action");
     configurationStash.set(configuration);
+  }
+
+  private static Category category(String categoryId) {
+    Category category = new Category();
+    category.setCategoryId(categoryId);
+    return category;
   }
 }

@@ -20,6 +20,9 @@
 	uri="http://stripes.sourceforge.net/stripes.tld"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<stripes:useActionBean
+	beanclass="org.mybatis.jpetstore.catalog.web.CatalogActionBean"
+	var="catalogNavigation" />
 <c:set var="pageView" value="${actionBean.pageView}" />
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -90,32 +93,18 @@
 </stripes:form></div>
 </div>
 
-<div id="QuickLinks"><stripes:link
-	beanclass="org.mybatis.jpetstore.catalog.web.CatalogActionBean"
-	event="viewCategory">
-	<stripes:param name="categoryId" value="FISH" />
-	<img src="../images/sm_fish.gif" />
-</stripes:link> <img src="../images/separator.gif" /> <stripes:link
-	beanclass="org.mybatis.jpetstore.catalog.web.CatalogActionBean"
-	event="viewCategory">
-	<stripes:param name="categoryId" value="DOGS" />
-	<img src="../images/sm_dogs.gif" />
-</stripes:link> <img src="../images/separator.gif" /> <stripes:link
-	beanclass="org.mybatis.jpetstore.catalog.web.CatalogActionBean"
-	event="viewCategory">
-	<stripes:param name="categoryId" value="REPTILES" />
-	<img src="../images/sm_reptiles.gif" />
-</stripes:link> <img src="../images/separator.gif" /> <stripes:link
-	beanclass="org.mybatis.jpetstore.catalog.web.CatalogActionBean"
-	event="viewCategory">
-	<stripes:param name="categoryId" value="CATS" />
-	<img src="../images/sm_cats.gif" />
-</stripes:link> <img src="../images/separator.gif" /> <stripes:link
-	beanclass="org.mybatis.jpetstore.catalog.web.CatalogActionBean"
-	event="viewCategory">
-	<stripes:param name="categoryId" value="BIRDS" />
-	<img src="../images/sm_birds.gif" />
-</stripes:link></div>
+<div id="QuickLinks"><c:forEach var="category"
+	items="${catalogNavigation.quickLinkCategories}" varStatus="status">
+	<c:if test="${!status.first}">
+		<img src="../images/separator.gif" />
+	</c:if>
+	<stripes:link
+		beanclass="org.mybatis.jpetstore.catalog.web.CatalogActionBean"
+		event="viewCategory">
+		<stripes:param name="categoryId" value="${category.categoryId}" />
+		<img src="${category.smallImagePath}" alt="${category.name}" />
+	</stripes:link>
+</c:forEach></div>
 
 </div>
 

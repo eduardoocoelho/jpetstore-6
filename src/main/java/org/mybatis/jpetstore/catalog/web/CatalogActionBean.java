@@ -15,7 +15,10 @@
  */
 package org.mybatis.jpetstore.catalog.web;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
@@ -44,6 +47,14 @@ public class CatalogActionBean extends AbstractActionBean {
   private static final String VIEW_PRODUCT = "/WEB-INF/jsp/catalog/Product.jsp";
   private static final String VIEW_ITEM = "/WEB-INF/jsp/catalog/Item.jsp";
   private static final String SEARCH_PRODUCTS = "/WEB-INF/jsp/catalog/SearchProducts.jsp";
+  private static final List<String> SIDEBAR_CATEGORY_ORDER = List.of("FISH", "DOGS", "CATS", "REPTILES", "BIRDS");
+  private static final Map<String, String> SIDEBAR_CATEGORY_DESCRIPTIONS = Map.of("FISH", "Saltwater, Freshwater",
+      "DOGS", "Various Breeds", "CATS", "Various Breeds, Exotic Varieties", "REPTILES", "Lizards, Turtles, Snakes",
+      "BIRDS", "Exotic Varieties");
+  private static final List<ImageMapAreaDefinition> MAIN_IMAGE_MAP_AREAS = List.of(
+      new ImageMapAreaDefinition("BIRDS", "72,2,280,250"), new ImageMapAreaDefinition("FISH", "2,180,72,250"),
+      new ImageMapAreaDefinition("DOGS", "60,250,130,320"), new ImageMapAreaDefinition("REPTILES", "140,270,210,340"),
+      new ImageMapAreaDefinition("CATS", "225,240,295,310"), new ImageMapAreaDefinition("BIRDS", "280,180,350,250"));
 
   @SpringBean
   private transient CatalogService catalogService;
@@ -128,6 +139,9 @@ public class CatalogActionBean extends AbstractActionBean {
   }
 
   public List<Category> getCategoryList() {
+    if (categoryList == null && catalogService != null) {
+      categoryList = catalogService.getCategoryList();
+    }
     return categoryList;
   }
 
@@ -149,6 +163,28 @@ public class CatalogActionBean extends AbstractActionBean {
 
   public void setItemList(List<Item> itemList) {
     this.itemList = itemList;
+  }
+
+  public List<CategoryNavigationItem> getQuickLinkCategories() {
+    return toNavigationItems(getCategoryList());
+  }
+
+  public List<CategoryNavigationItem> getSidebarCategories() {
+    List<Category> categories = getCategoryList();
+    if (categories == null) {
+      return List.of();
+    }
+    List<Category> sortedCategories = new ArrayList<>(categories);
+    sortedCategories.sort(Comparator.comparingInt(category -> sidebarOrder(category.getCategoryId())));
+    return toNavigationItems(sortedCategories);
+  }
+
+  public List<CategoryImageMapArea> getMainImageMapAreas() {
+    List<Category> categories = getCategoryList();
+    if (categories == null) {
+      return List.of();
+    }
+    return MAIN_IMAGE_MAP_AREAS.stream().map(area -> toImageMapArea(area, categories)).toList();
   }
 
   @DefaultHandler
@@ -227,6 +263,28 @@ public class CatalogActionBean extends AbstractActionBean {
     item = null;
     inventoryStatus = null;
     itemList = null;
+  }
+
+  private static List<CategoryNavigationItem> toNavigationItems(List<Category> categories) {
+    if (categories == null) {
+      return List.of();
+    }
+    return categories.stream().map(category -> new CategoryNavigationItem(category,
+        SIDEBAR_CATEGORY_DESCRIPTIONS.getOrDefault(category.getCategoryId(), category.getName()))).toList();
+  }
+
+  private static int sidebarOrder(String categoryId) {
+    int index = SIDEBAR_CATEGORY_ORDER.indexOf(categoryId);
+    return index < 0 ? SIDEBAR_CATEGORY_ORDER.size() : index;
+  }
+
+  private static CategoryImageMapArea toImageMapArea(ImageMapAreaDefinition area, List<Category> categories) {
+    return categories.stream().filter(category -> area.categoryId().equals(category.getCategoryId())).findFirst()
+        .map(category -> new CategoryImageMapArea(category, area.coordinates()))
+        .orElseThrow(() -> new IllegalStateException("Category " + area.categoryId() + " is missing."));
+  }
+
+  private record ImageMapAreaDefinition(String categoryId, String coordinates) {
   }
 
 }

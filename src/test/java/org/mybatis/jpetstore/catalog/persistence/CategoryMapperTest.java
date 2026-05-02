@@ -17,7 +17,6 @@ package org.mybatis.jpetstore.catalog.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Comparator;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -45,28 +44,29 @@ class CategoryMapperTest {
     List<Category> categories = mapper.getCategoryList();
 
     // then
-    categories.sort(Comparator.comparing(Category::getCategoryId));
     assertThat(categories).hasSize(5);
-    assertThat(categories.get(0).getCategoryId()).isEqualTo("BIRDS");
-    assertThat(categories.get(0).getName()).isEqualTo("Birds");
+    assertThat(categories).extracting(Category::getCategoryId).containsExactly("FISH", "DOGS", "REPTILES", "CATS",
+        "BIRDS");
+    assertThat(categories.get(0).getCategoryId()).isEqualTo("FISH");
+    assertThat(categories.get(0).getName()).isEqualTo("Fish");
     assertThat(categories.get(0).getDescription())
-        .isEqualTo("<image src=\"../images/birds_icon.gif\"><font size=\"5\" color=\"blue\"> Birds</font>");
-    assertThat(categories.get(1).getCategoryId()).isEqualTo("CATS");
-    assertThat(categories.get(1).getName()).isEqualTo("Cats");
-    assertThat(categories.get(1).getDescription())
-        .isEqualTo("<image src=\"../images/cats_icon.gif\"><font size=\"5\" color=\"blue\"> Cats</font>");
-    assertThat(categories.get(2).getCategoryId()).isEqualTo("DOGS");
-    assertThat(categories.get(2).getName()).isEqualTo("Dogs");
-    assertThat(categories.get(2).getDescription())
-        .isEqualTo("<image src=\"../images/dogs_icon.gif\"><font size=\"5\" color=\"blue\"> Dogs</font>");
-    assertThat(categories.get(3).getCategoryId()).isEqualTo("FISH");
-    assertThat(categories.get(3).getName()).isEqualTo("Fish");
-    assertThat(categories.get(3).getDescription())
         .isEqualTo("<image src=\"../images/fish_icon.gif\"><font size=\"5\" color=\"blue\"> Fish</font>");
-    assertThat(categories.get(4).getCategoryId()).isEqualTo("REPTILES");
-    assertThat(categories.get(4).getName()).isEqualTo("Reptiles");
-    assertThat(categories.get(4).getDescription())
+    assertThat(categories.get(1).getCategoryId()).isEqualTo("DOGS");
+    assertThat(categories.get(1).getName()).isEqualTo("Dogs");
+    assertThat(categories.get(1).getDescription())
+        .isEqualTo("<image src=\"../images/dogs_icon.gif\"><font size=\"5\" color=\"blue\"> Dogs</font>");
+    assertThat(categories.get(2).getCategoryId()).isEqualTo("REPTILES");
+    assertThat(categories.get(2).getName()).isEqualTo("Reptiles");
+    assertThat(categories.get(2).getDescription())
         .isEqualTo("<image src=\"../images/reptiles_icon.gif\"><font size=\"5\" color=\"blue\"> Reptiles</font>");
+    assertThat(categories.get(3).getCategoryId()).isEqualTo("CATS");
+    assertThat(categories.get(3).getName()).isEqualTo("Cats");
+    assertThat(categories.get(3).getDescription())
+        .isEqualTo("<image src=\"../images/cats_icon.gif\"><font size=\"5\" color=\"blue\"> Cats</font>");
+    assertThat(categories.get(4).getCategoryId()).isEqualTo("BIRDS");
+    assertThat(categories.get(4).getName()).isEqualTo("Birds");
+    assertThat(categories.get(4).getDescription())
+        .isEqualTo("<image src=\"../images/birds_icon.gif\"><font size=\"5\" color=\"blue\"> Birds</font>");
   }
 
   @Test

@@ -60,7 +60,6 @@ public class AccountActionBean extends AbstractActionBean implements SessionAcco
   private static final String SIGNON = "/WEB-INF/jsp/account/SignonForm.jsp";
 
   private static final List<String> LANGUAGE_LIST;
-  private static final List<String> CATEGORY_LIST;
 
   @SpringBean
   private transient AccountService accountService;
@@ -75,7 +74,6 @@ public class AccountActionBean extends AbstractActionBean implements SessionAcco
 
   static {
     LANGUAGE_LIST = Collections.unmodifiableList(Arrays.asList("english", "japanese"));
-    CATEGORY_LIST = Collections.unmodifiableList(Arrays.asList("FISH", "DOGS", "REPTILES", "CATS", "BIRDS"));
   }
 
   public Account getAccount() {
@@ -113,7 +111,10 @@ public class AccountActionBean extends AbstractActionBean implements SessionAcco
   }
 
   public List<String> getCategories() {
-    return CATEGORY_LIST;
+    if (catalogQueryService == null) {
+      return List.of();
+    }
+    return catalogQueryService.getCategoryList().stream().map(category -> category.getCategoryId()).toList();
   }
 
   public Resolution newAccountForm() {

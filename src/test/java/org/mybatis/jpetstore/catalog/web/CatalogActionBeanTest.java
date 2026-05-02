@@ -19,8 +19,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.mybatis.jpetstore.catalog.application.CatalogService;
+import org.mybatis.jpetstore.catalog.domain.Category;
 import org.mybatis.jpetstore.catalog.domain.Item;
 import org.mybatis.jpetstore.catalog.domain.Product;
 import org.mybatis.jpetstore.inventory.api.InventoryStatus;
@@ -95,6 +98,53 @@ class CatalogActionBeanTest {
     assertThat(catalogActionBean.getItem()).isSameAs(item);
     assertThat(catalogActionBean.getProduct()).isSameAs(product);
     assertThat(catalogActionBean.getInventoryStatus()).isSameAs(inventoryStatus);
+  }
+
+  @Test
+  void quickLinkCategoriesComeFromCatalogCategoryList() {
+    CatalogActionBean catalogActionBean = new CatalogActionBean();
+    CatalogService catalogService = mock(CatalogService.class);
+    ReflectionTestUtils.setField(catalogActionBean, "catalogService", catalogService);
+    when(catalogService.getCategoryList()).thenReturn(List.of(category("FISH", "Fish"), category("DOGS", "Dogs")));
+
+    List<CategoryNavigationItem> categories = catalogActionBean.getQuickLinkCategories();
+
+    assertThat(categories).extracting(CategoryNavigationItem::getCategoryId).containsExactly("FISH", "DOGS");
+    assertThat(categories).extracting(CategoryNavigationItem::getSmallImagePath)
+        .containsExactly("../images/sm_fish.gif", "../images/sm_dogs.gif");
+  }
+
+  @Test
+  void sidebarCategoriesPreserveMainPageOrderAndLabels() {
+    CatalogActionBean catalogActionBean = new CatalogActionBean();
+    CatalogService catalogService = mock(CatalogService.class);
+    ReflectionTestUtils.setField(catalogActionBean, "catalogService", catalogService);
+    when(catalogService.getCategoryList()).thenReturn(List.of(category("FISH", "Fish"), category("DOGS", "Dogs"),
+        category("REPTILES", "Reptiles"), category("CATS", "Cats"), category("BIRDS", "Birds")));
+
+    List<CategoryNavigationItem> categories = catalogActionBean.getSidebarCategories();
+
+    assertThat(categories).extracting(CategoryNavigationItem::getCategoryId).containsExactly("FISH", "DOGS", "CATS",
+        "REPTILES", "BIRDS");
+    assertThat(categories).extracting(CategoryNavigationItem::getSidebarDescription).containsExactly(
+        "Saltwater, Freshwater", "Various Breeds", "Various Breeds, Exotic Varieties", "Lizards, Turtles, Snakes",
+        "Exotic Varieties");
+  }
+
+  @Test
+  void mainImageMapAreasUseCatalogCategories() {
+    CatalogActionBean catalogActionBean = new CatalogActionBean();
+    CatalogService catalogService = mock(CatalogService.class);
+    ReflectionTestUtils.setField(catalogActionBean, "catalogService", catalogService);
+    when(catalogService.getCategoryList()).thenReturn(List.of(category("FISH", "Fish"), category("DOGS", "Dogs"),
+        category("REPTILES", "Reptiles"), category("CATS", "Cats"), category("BIRDS", "Birds")));
+
+    List<CategoryImageMapArea> areas = catalogActionBean.getMainImageMapAreas();
+
+    assertThat(areas).extracting(CategoryImageMapArea::getCategoryId).containsExactly("BIRDS", "FISH", "DOGS",
+        "REPTILES", "CATS", "BIRDS");
+    assertThat(areas).extracting(CategoryImageMapArea::getCoordinates).containsExactly("72,2,280,250", "2,180,72,250",
+        "60,250,130,320", "140,270,210,340", "225,240,295,310", "280,180,350,250");
   }
 
   // Test written by Diffblue Cover.
@@ -180,5 +230,12 @@ class CatalogActionBeanTest {
     assertThat(actual).isNotNull();
     assertThat(actual.getContext()).isNull();
 
+  }
+
+  private static Category category(String categoryId, String name) {
+    Category category = new Category();
+    category.setCategoryId(categoryId);
+    category.setName(name);
+    return category;
   }
 }
