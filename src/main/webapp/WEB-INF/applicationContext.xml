@@ -48,7 +48,7 @@
                           org.mybatis.jpetstore.shared.application" />
 
     <!-- enable transaction demarcation with annotations -->
-    <tx:annotation-driven />
+    <tx:annotation-driven proxy-target-class="true" />
 
     <!-- define the SqlSessionFactory -->
     <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">

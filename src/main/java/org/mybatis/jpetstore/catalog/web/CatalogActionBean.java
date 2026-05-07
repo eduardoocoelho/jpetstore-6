@@ -20,6 +20,7 @@ import java.util.List;
 import net.sourceforge.stripes.action.DefaultHandler;
 import net.sourceforge.stripes.action.ForwardResolution;
 import net.sourceforge.stripes.action.SessionScope;
+import net.sourceforge.stripes.action.UrlBinding;
 import net.sourceforge.stripes.integration.spring.SpringBean;
 
 import org.mybatis.jpetstore.catalog.application.CatalogService;
@@ -35,6 +36,7 @@ import org.mybatis.jpetstore.shared.web.AbstractActionBean;
  * @author Eduardo Macarron
  */
 @SessionScope
+@UrlBinding("/actions/Catalog.action")
 public class CatalogActionBean extends AbstractActionBean {
 
   private static final long serialVersionUID = 5849523372175050635L;
